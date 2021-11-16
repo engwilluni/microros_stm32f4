@@ -1,0 +1,10 @@
+custom_memory_manager.c:77:7:pvPortMallocMicroROS	48	static,ignoring_inline_asm
+custom_memory_manager.c:227:6:vPortFreeMicroROS	32	static,ignoring_inline_asm
+custom_memory_manager.c:276:8:getBlockSize	32	static
+custom_memory_manager.c:291:7:pvPortReallocMicroROS	40	static
+custom_memory_manager.c:319:7:pvPortCallocMicroROS	32	static
+custom_memory_manager.c:335:8:xPortGetFreeHeapSizeMicroROS	4	static
+custom_memory_manager.c:341:8:xPortGetMinimumEverFreeHeapSizeMicroROS	4	static
+custom_memory_manager.c:347:6:vPortInitialiseBlocksMicroROS	4	static
+custom_memory_manager.c:353:13:prvHeapInit	24	static
+custom_memory_manager.c:401:13:prvInsertBlockIntoFreeList	24	static
