@@ -67,7 +67,7 @@ main-build: exemplo_microros_f4.elf secondary-outputs
 
 # Tool invocations
 exemplo_microros_f4.elf: $(OBJS) $(USER_OBJS) /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "exemplo_microros_f4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exemplo_microros_f4.map" -Wl,--gc-sections -static -L"/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "exemplo_microros_f4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exemplo_microros_f4.map" -Wl,--gc-sections -static -L"/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _scanf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

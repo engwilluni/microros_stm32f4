@@ -19,6 +19,9 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_adc.h \
+ ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h \
@@ -138,24 +141,25 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rmw_microros/custom_transport.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rosidl_runtime_c/string.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rosidl_runtime_c/primitives_sequence.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/joint_state.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/joint_state__struct.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/header__struct.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/builtin_interfaces/msg/detail/time__struct.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/joint_state__functions.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/rosidl_generator_c__visibility_control.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/joint_state__type_support.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/twist.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/twist__struct.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/vector3__struct.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/twist__functions.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/rosidl_generator_c__visibility_control.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/twist__type_support.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/int32.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/int32__struct.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/int32__functions.h \
  /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/rosidl_generator_c__visibility_control.h \
- /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/int32__type_support.h
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/int32__type_support.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/nav_sat_fix.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_fix__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/header__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/builtin_interfaces/msg/detail/time__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_status__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_fix__functions.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/rosidl_generator_c__visibility_control.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_fix__type_support.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/u_int16_multi_array.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/u_int16_multi_array__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/multi_array_layout__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/multi_array_dimension__struct.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/u_int16_multi_array__functions.h \
+ /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/u_int16_multi_array__type_support.h
 
 ../Core/Inc/main.h:
 
@@ -198,6 +202,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_adc.h:
+
+../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_adc_ex.h:
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash.h:
 
@@ -437,32 +447,6 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 
 /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/rosidl_runtime_c/primitives_sequence.h:
 
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/joint_state.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/joint_state__struct.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/header__struct.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/builtin_interfaces/msg/detail/time__struct.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/joint_state__functions.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/rosidl_generator_c__visibility_control.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/joint_state__type_support.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/twist.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/twist__struct.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/vector3__struct.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/twist__functions.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/rosidl_generator_c__visibility_control.h:
-
-/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/geometry_msgs/msg/detail/twist__type_support.h:
-
 /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/int32.h:
 
 /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/int32__struct.h:
@@ -472,3 +456,31 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/rosidl_generator_c__visibility_control.h:
 
 /home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/int32__type_support.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/nav_sat_fix.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_fix__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/header__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/builtin_interfaces/msg/detail/time__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_status__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_fix__functions.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/rosidl_generator_c__visibility_control.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/sensor_msgs/msg/detail/nav_sat_fix__type_support.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/u_int16_multi_array.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/u_int16_multi_array__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/multi_array_layout__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/multi_array_dimension__struct.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/u_int16_multi_array__functions.h:
+
+/home/will7seven/STM32CubeIDE/workspace_1.7.0/exemplo_microros_f4/Debug/../micro_ros_stm32cubemx_utils/microros_static_library_ide/libmicroros/include/std_msgs/msg/detail/u_int16_multi_array__type_support.h:

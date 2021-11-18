@@ -33,10 +33,12 @@
 #include <rosidl_runtime_c/string.h>
 
 #include <time.h>
+#include <math.h>
 
-#include <sensor_msgs/msg/joint_state.h>             // for the encoder msg
-#include <geometry_msgs/msg/twist.h>                 // for the motors control
+
 #include <std_msgs/msg/int32.h>
+#include <sensor_msgs/msg/nav_sat_fix.h>
+#include <std_msgs/msg/u_int16_multi_array.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,6 +48,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define TF_GPS_DATA 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -54,6 +57,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+ADC_HandleTypeDef hadc1;
+DMA_HandleTypeDef hdma_adc1;
+
 I2C_HandleTypeDef hi2c1;
 
 I2S_HandleTypeDef hi2s3;
@@ -80,7 +86,7 @@ const osThreadAttr_t task_ros2_attributes = {
 osThreadId_t task_gpsHandle;
 const osThreadAttr_t task_gps_attributes = {
   .name = "task_gps",
-  .stack_size = 256 * 4,
+  .stack_size = 1024 * 4,
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* Definitions for task_stepper */
@@ -127,20 +133,45 @@ const osThreadAttr_t task_main_attributes = {
 };
 /* USER CODE BEGIN PV */
 /* Subscriber declaration */
-rcl_subscription_t cmd_vel_sub;
+
+rcl_subscription_t ros2_gpio_output_sub;
 
 /* Publisher declaration */
-rcl_publisher_t joint_state_pub;
-rcl_publisher_t int32_pub;
+
+rcl_publisher_t ros2_gpio_input_pub;
+rcl_publisher_t ros2_gps_pub;
+rcl_publisher_t ros2_analog_input_pub;
 
 /* ROS timer declaration */
-rcl_timer_t timer;
-rcl_timer_t timer2;
+
+rcl_timer_t ros2_gpio_input_timer;
+rcl_timer_t ros2_gps_timer;
+rcl_timer_t ros2_analog_input_timer;
 
 /* Messages declaration */
-sensor_msgs__msg__JointState joint_state_msg;
-geometry_msgs__msg__Twist cmd_vel_msg;
-std_msgs__msg__Int32 int32_msg;
+
+
+std_msgs__msg__Int32 ros2_gpio_input_msg;
+sensor_msgs__msg__NavSatFix ros2_gps_msg;
+std_msgs__msg__UInt16MultiArray ros2_analog_input_msg;
+std_msgs__msg__Int32 ros2_gpio_output_msg;
+
+uint16_t adc_values[2];
+uint32_t gpio_input;
+uint8_t gps_buffer[256];
+uint8_t gps_buffer_index = 0;
+uint8_t* p_gps_buff;
+uint8_t uart_gps_rx = 0;
+
+HAL_StatusTypeDef status;
+
+//gps data
+float gps_time=0 , gps_latitude=0, gps_longitude=0, gps_hdop=0, gps_alt=0, gps_geoid=0;
+char gps_latitude_string[32];
+char gps_longitude_string[32];
+char gps_alt_string[32];
+char ns='?', ew='?', unit='?';
+int lock = 0, sats=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -154,6 +185,7 @@ static void MX_USART2_UART_Init(void);
 static void MX_USB_OTG_FS_HCD_Init(void);
 static void MX_TIM1_Init(void);
 static void MX_USART3_UART_Init(void);
+static void MX_ADC1_Init(void);
 void task_ros2_function(void *argument);
 void task_gps_function(void *argument);
 void task_stepper_function(void *argument);
@@ -174,11 +206,15 @@ void microros_deallocate(void * pointer, void * state);
 void * microros_reallocate(void * pointer, size_t size, void * state);
 void * microros_zero_allocate(size_t number_of_elements, size_t size_of_element, void * state);
 
-void timer_callback(rcl_timer_t * timer, int64_t last_call_time);
-void cmd_vel_callback(const void * msgin);
+
+void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+void ros2_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+void ros2_gpio_output_callback(const void * msgin);
 
 //extern int clock_gettime( int clock_id, struct timespec * tp );
 extern void UTILS_NanosecondsToTimespec( int64_t llSource, struct timespec * const pxDestination );
+double convertDegMinToDecDeg (float degMin);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -222,8 +258,10 @@ int main(void)
   MX_USB_OTG_FS_HCD_Init();
   MX_TIM1_Init();
   MX_USART3_UART_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_ADC_Start_DMA(&hadc1, adc_values, 2);
+  status = HAL_UART_Receive_IT(&huart3, &uart_gps_rx, 1);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -334,6 +372,64 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief ADC1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_ADC1_Init(void)
+{
+
+  /* USER CODE BEGIN ADC1_Init 0 */
+
+  /* USER CODE END ADC1_Init 0 */
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+
+  /* USER CODE BEGIN ADC1_Init 1 */
+
+  /* USER CODE END ADC1_Init 1 */
+  /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
+  */
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.NbrOfConversion = 2;
+  hadc1.Init.DMAContinuousRequests = ENABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_14;
+  sConfig.Rank = 1;
+  sConfig.SamplingTime = ADC_SAMPLETIME_28CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
+  */
+  sConfig.Channel = ADC_CHANNEL_15;
+  sConfig.Rank = 2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN ADC1_Init 2 */
+
+  /* USER CODE END ADC1_Init 2 */
+
 }
 
 /**
@@ -566,7 +662,7 @@ static void MX_USART3_UART_Init(void)
 
   /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
+  huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
   huart3.Init.StopBits = UART_STOPBITS_1;
   huart3.Init.Parity = UART_PARITY_NONE;
@@ -622,6 +718,7 @@ static void MX_DMA_Init(void)
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA1_CLK_ENABLE();
+  __HAL_RCC_DMA2_CLK_ENABLE();
 
   /* DMA interrupt init */
   /* DMA1_Stream5_IRQn interrupt configuration */
@@ -630,6 +727,9 @@ static void MX_DMA_Init(void)
   /* DMA1_Stream6_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(DMA1_Stream6_IRQn, 5, 0);
   HAL_NVIC_EnableIRQ(DMA1_Stream6_IRQn);
+  /* DMA2_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 
 }
 
@@ -730,91 +830,128 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+
+/**
+ * Convert NMEA absolute position to decimal degrees
+ * "ddmm.mmmm" or "dddmm.mmmm" really is D+M/60,
+ * then negated if quadrant is 'W' or 'S'
+ */
+double convertDegMinToDecDeg (float degMin)
 {
-	if (timer != NULL) {
+  double min = 0.0;
+  double decDeg = 0.0;
+
+  //get the minutes, fmod() requires double
+  min = fmod((double)degMin, 100.0);
+
+  //rebuild coordinates in decimal degrees
+  degMin = (int) ( degMin / 100 );
+  decDeg = degMin + ( min / 60 );
+
+  return decDeg;
+}
+
+void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+{
+
 		// Blink the LED1 (yellow) for debugging
 		//HAL_GPIO_TogglePin(LD2_GPIO_Port , LD2_Pin);
 
 		// Fill the message timestamp
+
+		//clock_gettime(CLOCK_REALTIME, &ts);
+
+		// Create the Header
+
+
+
+		//sprintf(joint_state_msg.header.frame_id.data, "%ld", seq_no);
+		//joint_state_msg.header.frame_id.size = strlen(joint_state_msg.header.frame_id.data);
+
+		ros2_gpio_input_msg.data= gpio_input;
+
+		// Publish the message
+		rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub, &ros2_gpio_input_msg, NULL);
+		if (ret != RCL_RET_OK)
+		{
+		  printf("Error publishing joint_state (line %d)\n", __LINE__);
+		}
+}
+
+void ros2_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
+	if (timer != NULL) {
+// Fill the message timestamp
 		struct timespec ts;
 		int64_t time_ns;
 		time_ns = rmw_uros_epoch_nanos();
 		UTILS_NanosecondsToTimespec(time_ns, &ts);
-		//clock_gettime(CLOCK_REALTIME, &ts);
 
-		// Create the Header
-		joint_state_msg.header.stamp.sec = ts.tv_sec;
-		joint_state_msg.header.stamp.nanosec = ts.tv_nsec;
 
-		//sprintf(joint_state_msg.header.frame_id.data, "%ld", seq_no);
-		//joint_state_msg.header.frame_id.size = strlen(joint_state_msg.header.frame_id.data);
+	// Create the Header
+		ros2_gps_msg.header.stamp.sec = ts.tv_sec;
+		ros2_gps_msg.header.stamp.nanosec = ts.tv_nsec;
 
-		joint_state_msg.position.data[0] = 1;
-		joint_state_msg.position.data[1] = 2;
-		joint_state_msg.velocity.data[0] = 3;
-		joint_state_msg.velocity.data[1] = 4;
-		joint_state_msg.effort.data[0] = 5;
-		joint_state_msg.effort.data[1] = 6;
-
+		ros2_gps_msg.latitude = gps_latitude;
+		ros2_gps_msg.longitude = gps_longitude;
+		ros2_gps_msg.altitude = gps_alt;
 		// Publish the message
-		rcl_ret_t ret = rcl_publish(&joint_state_pub, &joint_state_msg, NULL);
-		if (ret != RCL_RET_OK)
-		{
-		  printf("Error publishing joint_state (line %d)\n", __LINE__);
-		}
+				rcl_ret_t ret = rcl_publish(&ros2_gps_pub, &ros2_gps_msg, NULL);
+				if (ret != RCL_RET_OK)
+				{
+				  printf("Error publishing gps (line %d)\n", __LINE__);
+				}
+			}
+
+
+}
+
+void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
+	if (timer != NULL) {
+	ros2_analog_input_msg.data.data[0] = adc_values[0];
+	ros2_analog_input_msg.data.data[1] = adc_values[1];
+	// Publish the message
+					rcl_ret_t ret = rcl_publish(&ros2_analog_input_pub, &ros2_analog_input_msg, NULL);
+					if (ret != RCL_RET_OK)
+					{
+					  printf("Error publishing gps (line %d)\n", __LINE__);
+					}
 	}
-}
-
-void timer2_callback(rcl_timer_t * timer, int64_t last_call_time)
-{
-
-		// Blink the LED1 (yellow) for debugging
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port , LD2_Pin);
-
-		// Fill the message timestamp
-
-		//clock_gettime(CLOCK_REALTIME, &ts);
-
-		// Create the Header
-
-
-
-		//sprintf(joint_state_msg.header.frame_id.data, "%ld", seq_no);
-		//joint_state_msg.header.frame_id.size = strlen(joint_state_msg.header.frame_id.data);
-
-		int32_msg.data++;
-
-		// Publish the message
-		rcl_ret_t ret = rcl_publish(&int32_pub, &int32_msg, NULL);
-		if (ret != RCL_RET_OK)
-		{
-		  printf("Error publishing joint_state (line %d)\n", __LINE__);
-		}
 
 }
 
-void cmd_vel_callback(const void * msgin)
-{
-	double leftWheelVelocity, rightWheelVelocity;
-	double linearX, linearY, linearZ, angularX, angularY, angularZ;
-	const geometry_msgs__msg__Twist * cmd_vel_msg;
 
+
+void ros2_gpio_output_callback(const void * msgin)
+{
+
+	const std_msgs__msg__Int32 *gpio_output_msg;
+	int32_t data = 0;
 	if (msgin != NULL)
 	{
 
-		// Blink the LED2 (orange) for debugging
-		HAL_GPIO_TogglePin(GPIOD, GPIO_PIN_15);
 
-		cmd_vel_msg = (const geometry_msgs__msg__Twist *)msgin;
 
-		linearX = cmd_vel_msg->linear.x;
-		linearY = cmd_vel_msg->linear.y;
-		linearZ = cmd_vel_msg->linear.z;
-		angularX = cmd_vel_msg->angular.x;
-		angularY = cmd_vel_msg->angular.y;
-		angularZ = cmd_vel_msg->angular.z;
+		gpio_output_msg = (const std_msgs__msg__Int32 *)msgin;
+		data = gpio_output_msg->data;
+		HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, (data & 0x00000001));
+
+
 	}
+}
+
+
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+if (huart->Instance == USART3){
+	if ((uart_gps_rx != '\n') && gps_buffer_index < sizeof(gps_buffer)){
+		gps_buffer[gps_buffer_index++] = uart_gps_rx;
+	} else {
+		osThreadFlagsSet(task_gpsHandle, TF_GPS_DATA);
+	}
+
+	status = HAL_UART_Receive_IT(&huart3, &uart_gps_rx, 1);
+
+}
 }
 /* USER CODE END 4 */
 
@@ -918,81 +1055,79 @@ void task_ros2_function(void *argument)
 	  //time_ns = rmw_uros_epoch_nanos();
 
 
-	  // create cmd_vel_sub
-	  cmd_vel_sub = rcl_get_zero_initialized_subscription();
+
+
+	  //create gpio_output_sub
+	  ros2_gpio_output_sub = rcl_get_zero_initialized_subscription();
 	  rclc_subscription_init_best_effort(
-			  &cmd_vel_sub,
-			  &node,
-			  ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
-			  "/cmd_vel");
-
-
-	  // create joint_state_pub
-	  rclc_publisher_init_default(
-		&joint_state_pub,
-		&node,
-		ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
-		"/joint_state");
-
-
-	  // int32 pub
-	  rclc_publisher_init_default(
-			  &int32_pub,
+			  &ros2_gpio_output_sub,
 			  &node,
 			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
-			  "/std_msgs_msg_Int32");
-
-	  // joint_state message allocation. Described in https://micro.ros.org/docs/tutorials/advanced/handling_type_memory/
-	  joint_state_msg.header.frame_id.capacity = 20;
-	  joint_state_msg.header.frame_id.data = (char*) pvPortMalloc(joint_state_msg.header.frame_id.capacity  * sizeof(char));
-	  joint_state_msg.header.frame_id.size = strlen(joint_state_msg.header.frame_id.data);
-
-	  joint_state_msg.name.capacity = 2;
-	  joint_state_msg.name.data = (rosidl_runtime_c__String*) pvPortMalloc(joint_state_msg.name.capacity * sizeof(rosidl_runtime_c__String));
-	  joint_state_msg.name.size = 2;
-
-		joint_state_msg.name.data[0].capacity = 20;
-		joint_state_msg.name.data[0].data = (char*) pvPortMalloc(joint_state_msg.name.data[0].capacity * sizeof(char));
-		strcpy(joint_state_msg.name.data[0].data, "Roda_L_Joint");
-		joint_state_msg.name.data[0].size = strlen(joint_state_msg.name.data[0].data);
-		joint_state_msg.name.data[1].capacity = 20;
-		joint_state_msg.name.data[1].data = (char*) pvPortMalloc(joint_state_msg.name.data[1].capacity* sizeof(char));
-		strcpy(joint_state_msg.name.data[1].data, "Roda_R_Joint");
-		joint_state_msg.name.data[1].size = strlen(joint_state_msg.name.data[1].data);
-		joint_state_msg.name.size=2;
-
-		joint_state_msg.position.capacity = 2;
-		joint_state_msg.position.data = (double*) pvPortMalloc(joint_state_msg.position.capacity * sizeof(double));
-		joint_state_msg.position.data[0] = 0;
-		joint_state_msg.position.data[1] = 0;
-		joint_state_msg.position.size = 2;
-
-	  joint_state_msg.velocity.capacity = 2;
-	  joint_state_msg.velocity.data = (double*) pvPortMalloc(joint_state_msg.velocity.capacity * sizeof(double));
-	  joint_state_msg.velocity.data[0] = 0;
-	  joint_state_msg.velocity.data[1] = 0;
-	  joint_state_msg.velocity.size = 2;
-
-	  joint_state_msg.effort.capacity = 2;
-	  joint_state_msg.effort.data = (double*) pvPortMalloc(joint_state_msg.effort.capacity * sizeof(double));
-	  joint_state_msg.effort.data[0]=-1;
-	  joint_state_msg.effort.data[1]=-1;
-	  joint_state_msg.effort.size = 2;
+			  "/gpio_output");
 
 
+
+	  // gpio_input pub
+	  rclc_publisher_init_default(
+			  &ros2_gpio_input_pub,
+			  &node,
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+			  "/gpio_input");
+
+	  // gps_pub
+	  rclc_publisher_init_default(
+	  			  &ros2_gps_pub,
+	  			  &node,
+	  			  ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, NavSatFix),
+	  			  "/gps");
+
+	  rclc_publisher_init_default(
+	  			  &ros2_analog_input_pub,
+	  			  &node,
+	  			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt16MultiArray),
+	  			  "/analog_input");
+
+
+
+
+	  // gps memmory allocation
+	  ros2_gps_msg.header.frame_id.capacity = 20;
+	  ros2_gps_msg.header.frame_id.data = (char*) pvPortMalloc(ros2_gps_msg.header.frame_id.capacity  * sizeof(char));
+	  ros2_gps_msg.header.frame_id.size = strlen(ros2_gps_msg.header.frame_id.data);
+
+
+	  // analog input allocation
+	  ros2_analog_input_msg.data.capacity = 2;
+	  ros2_analog_input_msg.data.size = 2;
+	  ros2_analog_input_msg.data.data = (uint16_t*) pvPortMalloc(ros2_analog_input_msg.data.capacity * sizeof(uint16_t));
+	  ros2_analog_input_msg.layout.dim.capacity = 2;
+	  ros2_analog_input_msg.layout.dim.size = 2;
+	  ros2_analog_input_msg.layout.dim.data = (std_msgs__msg__MultiArrayDimension*) pvPortMalloc(ros2_analog_input_msg.layout.dim.capacity * sizeof(std_msgs__msg__MultiArrayDimension));
+	  for (size_t i =0; i< ros2_analog_input_msg.layout.dim.capacity; i++){
+		  ros2_analog_input_msg.layout.dim.data[i].label.capacity = 20;
+		  ros2_analog_input_msg.layout.dim.data[i].label.size = 10;
+		  ros2_analog_input_msg.layout.dim.data[i].label.data = (char*) pvPortMalloc(ros2_analog_input_msg.layout.dim.data[i].label.capacity * sizeof(char));
+
+	  }
+	  strcpy(ros2_analog_input_msg.layout.dim.data[0].label.data, "Analog 1");
+	  strcpy(ros2_analog_input_msg.layout.dim.data[1].label.data, "Analog 2");
 
 
 	  // Create a timer
-	  rclc_timer_init_default(&timer, &support, RCL_MS_TO_NS(10), timer_callback);
-	  rclc_timer_init_default(&timer2, &support, RCL_MS_TO_NS(1000), timer2_callback);
+	  rclc_timer_init_default(&ros2_gpio_input_timer, &support, RCL_MS_TO_NS(1000), ros2_gpio_input_timer_callback);
+	  rclc_timer_init_default(&ros2_gps_timer, &support, RCL_MS_TO_NS(1000), ros2_gps_timer_callback);
+	  rclc_timer_init_default(&ros2_analog_input_timer, &support, RCL_MS_TO_NS(50), ros2_analog_input_timer_callback);
 
 	  // Create executor
-	  rclc_executor_init(&executor, &support.context, 3, &allocator);
-	  rclc_executor_add_subscription(&executor, &cmd_vel_sub, &cmd_vel_msg,
-			  &cmd_vel_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
-	  rclc_executor_add_timer(&executor, &timer);
-	  rclc_executor_add_timer(&executor, &timer2);
-	  int32_msg.data = 0;
+	  rclc_executor_init(&executor, &support.context, 4, &allocator);
+
+	  rclc_executor_add_subscription(&executor, &ros2_gpio_output_sub, &ros2_gpio_output_msg,
+	  			  &ros2_gpio_output_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
+
+	  rclc_executor_add_timer(&executor, &ros2_gpio_input_timer);
+	  rclc_executor_add_timer(&executor, &ros2_gps_timer);
+	  rclc_executor_add_timer(&executor, &ros2_analog_input_timer);
+
 
 	  // Run executor
 	  rclc_executor_spin(&executor);
@@ -1015,10 +1150,25 @@ void task_ros2_function(void *argument)
 void task_gps_function(void *argument)
 {
   /* USER CODE BEGIN task_gps_function */
+	//uint8_t gpgga[] = "$GPGGA,092725.00,4717.11399,N,00833.91590,E,1,8,1.01,499.6,M,48.0,M,,0*5B\r\n";
+
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    osThreadFlagsWait(TF_GPS_DATA, osFlagsWaitAny, osWaitForever);
+    if(sscanf(gps_buffer, "$GPGGA,%f,%f,%c,%f,%c,%d,%d,%f,%f,%c,%f", &gps_time, &gps_latitude, &ns, &gps_longitude, &ew, &lock, &sats, &gps_hdop, &gps_alt, &unit, &gps_geoid) >= 1){
+    	gps_latitude = (float) convertDegMinToDecDeg(gps_latitude);
+    	gps_longitude = (float) convertDegMinToDecDeg(gps_longitude);
+    	if (ns == 'S') {
+    		gps_latitude = - gps_latitude;
+    	}
+    	if (ew = 'W'){
+    		gps_longitude = - gps_longitude;
+    	}
+    }
+    gps_buffer_index = 0;
+    memset(gps_buffer, 0, sizeof(gps_buffer));
   }
   /* USER CODE END task_gps_function */
 }
@@ -1105,10 +1255,19 @@ void task_dac_function(void *argument)
 void task_digital_io_function(void *argument)
 {
   /* USER CODE BEGIN task_digital_io_function */
+	uint16_t button_input = 0;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+	  button_input = HAL_GPIO_ReadPin(PB0_GPIO_Port, PB0_Pin);
+
+	  if (button_input == GPIO_PIN_RESET){
+		  gpio_input &= !(1<<0);
+	  }
+	  else {
+		  gpio_input |= (1<<0);
+	  }
+    osDelay(50);
   }
   /* USER CODE END task_digital_io_function */
 }
