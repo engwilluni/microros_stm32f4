@@ -38,6 +38,7 @@
 
 
 #include <std_msgs/msg/int32.h>
+#include <std_msgs/msg/u_int32.h>
 #include <sensor_msgs/msg/nav_sat_fix.h>
 #include <std_msgs/msg/u_int16_multi_array.h>
 /* USER CODE END Includes */
@@ -136,26 +137,31 @@ const osThreadAttr_t task_main_attributes = {
 /* Subscriber declaration */
 
 rcl_subscription_t ros2_gpio_output_sub;
+rcl_subscription_t ros2_stepper_target_position_sub;
 
 /* Publisher declaration */
 
 rcl_publisher_t ros2_gpio_input_pub;
 rcl_publisher_t ros2_gps_pub;
 rcl_publisher_t ros2_analog_input_pub;
+rcl_publisher_t ros2_stepper_current_position_pub;
 
 /* ROS timer declaration */
 
 rcl_timer_t ros2_gpio_input_timer;
 rcl_timer_t ros2_gps_timer;
 rcl_timer_t ros2_analog_input_timer;
+rcl_timer_t ros2_stepper_current_position_timer;
 
 /* Messages declaration */
 
 
-std_msgs__msg__Int32 ros2_gpio_input_msg;
+std_msgs__msg__UInt32 ros2_gpio_input_msg;
 sensor_msgs__msg__NavSatFix ros2_gps_msg;
 std_msgs__msg__UInt16MultiArray ros2_analog_input_msg;
-std_msgs__msg__Int32 ros2_gpio_output_msg;
+std_msgs__msg__UInt32 ros2_gpio_output_msg;
+std_msgs__msg__UInt32 ros2_stepper_target_position_msg;
+std_msgs__msg__UInt32 ros2_stepper_current_position_msg;
 
 uint16_t adc_values[2];
 uint32_t gpio_input;
@@ -165,6 +171,8 @@ uint8_t* p_gps_buff;
 uint8_t uart_gps_rx = 0;
 
 stepper_t stepper1;
+
+
 
 HAL_StatusTypeDef status;
 
@@ -213,7 +221,10 @@ void * microros_zero_allocate(size_t number_of_elements, size_t size_of_element,
 void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void ros2_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+void ros2_stepper_current_position_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+
 void ros2_gpio_output_callback(const void * msgin);
+void ros2_stepper_target_position_callback(const void * msgin);
 
 //extern int clock_gettime( int clock_id, struct timespec * tp );
 extern void UTILS_NanosecondsToTimespec( int64_t llSource, struct timespec * const pxDestination );
@@ -864,7 +875,7 @@ void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 		rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub, &ros2_gpio_input_msg, NULL);
 		if (ret != RCL_RET_OK)
 		{
-		  printf("Error publishing joint_state (line %d)\n", __LINE__);
+		  printf("Error publishing gpio input (line %d)\n", __LINE__);
 		}
 }
 
@@ -903,25 +914,50 @@ void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_tim
 					rcl_ret_t ret = rcl_publish(&ros2_analog_input_pub, &ros2_analog_input_msg, NULL);
 					if (ret != RCL_RET_OK)
 					{
-					  printf("Error publishing gps (line %d)\n", __LINE__);
+					  printf("Error publishing analog input (line %d)\n", __LINE__);
 					}
 	}
 
 }
 
+void ros2_stepper_current_position_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
+	if (timer != NULL) {
+	ros2_stepper_current_position_msg.data = stepper1.currentPos;
+	// Publish the message
+					rcl_ret_t ret = rcl_publish(&ros2_stepper_current_position_pub, &ros2_stepper_current_position_msg, NULL);
+					if (ret != RCL_RET_OK)
+					{
+					  printf("Error publishing stepper current position (line %d)\n", __LINE__);
+					}
+	}
+}
 
+
+void ros2_stepper_target_position_callback(const void * msgin){
+	const std_msgs__msg__UInt32 *stepper_target_position_msg;
+
+		if (msgin != NULL)
+		{
+
+
+
+			stepper_target_position_msg = (const std_msgs__msg__UInt32 *)msgin;
+			stepper1.targetPos = stepper_target_position_msg->data;
+
+		}
+}
 
 void ros2_gpio_output_callback(const void * msgin)
 {
 
-	const std_msgs__msg__Int32 *gpio_output_msg;
+	const std_msgs__msg__UInt32 *gpio_output_msg;
 	int32_t data = 0;
 	if (msgin != NULL)
 	{
 
 
 
-		gpio_output_msg = (const std_msgs__msg__Int32 *)msgin;
+		gpio_output_msg = (const std_msgs__msg__UInt32 *)msgin;
 		data = gpio_output_msg->data;
 		HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, (data & 0x00000001));
 
@@ -1065,8 +1101,16 @@ void task_ros2_function(void *argument)
 	  rclc_subscription_init_best_effort(
 			  &ros2_gpio_output_sub,
 			  &node,
-			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
 			  "/gpio_output");
+
+	  //create stepper_target_positoin_sub
+	  ros2_stepper_target_position_sub = rcl_get_zero_initialized_subscription();
+	 	  rclc_subscription_init_best_effort(
+	 			  &ros2_stepper_target_position_sub,
+	 			  &node,
+	 			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
+	 			  "/stepper_target_position");
 
 
 
@@ -1074,7 +1118,7 @@ void task_ros2_function(void *argument)
 	  rclc_publisher_init_default(
 			  &ros2_gpio_input_pub,
 			  &node,
-			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int32),
+			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
 			  "/gpio_input");
 
 	  // gps_pub
@@ -1091,6 +1135,11 @@ void task_ros2_function(void *argument)
 	  			  "/analog_input");
 
 
+	  rclc_publisher_init_default(
+	  	  			  &ros2_stepper_current_position_pub,
+	  	  			  &node,
+	  	  			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
+	  	  			  "/stepper_current_position");
 
 
 	  // gps memmory allocation
@@ -1120,16 +1169,21 @@ void task_ros2_function(void *argument)
 	  rclc_timer_init_default(&ros2_gpio_input_timer, &support, RCL_MS_TO_NS(1000), ros2_gpio_input_timer_callback);
 	  rclc_timer_init_default(&ros2_gps_timer, &support, RCL_MS_TO_NS(1000), ros2_gps_timer_callback);
 	  rclc_timer_init_default(&ros2_analog_input_timer, &support, RCL_MS_TO_NS(50), ros2_analog_input_timer_callback);
+	  rclc_timer_init_default(&ros2_stepper_current_position_timer, &support, RCL_MS_TO_NS(50), ros2_stepper_current_position_timer_callback);
 
 	  // Create executor
-	  rclc_executor_init(&executor, &support.context, 4, &allocator);
+	  rclc_executor_init(&executor, &support.context, 6, &allocator);
 
 	  rclc_executor_add_subscription(&executor, &ros2_gpio_output_sub, &ros2_gpio_output_msg,
 	  			  &ros2_gpio_output_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
+	  rclc_executor_add_subscription(&executor, &ros2_stepper_target_position_sub, &ros2_stepper_target_position_msg,
+	 	  			  &ros2_stepper_target_position_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
 
 	  rclc_executor_add_timer(&executor, &ros2_gpio_input_timer);
 	  rclc_executor_add_timer(&executor, &ros2_gps_timer);
 	  rclc_executor_add_timer(&executor, &ros2_analog_input_timer);
+	  rclc_executor_add_timer(&executor, &ros2_stepper_current_position_timer);
+
 
 
 	  // Run executor
@@ -1192,7 +1246,7 @@ void task_stepper_function(void *argument)
 	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
 	stepperSetAcceleration(&stepper1, 250);
 	stepperSetMaxSpeed(&stepper1, 500);
-	stepperSetAbsoluteTartePosition(&stepper1, 5000);
+	stepperSetAbsoluteTartePosition(&stepper1, 0);
 	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
 	 HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
   /* Infinite loop */
