@@ -1,0 +1,14 @@
+stepper.c:4:6:stepperInit	16	static
+stepper.c:20:6:stepperSetSpeed	24	static
+stepper.c:42:7:stepperGetSpeed	16	static
+stepper.c:47:6:stepperSetMaxSpeed	24	static
+stepper.c:62:7:stepperGetMaxSpeed	16	static
+stepper.c:66:6:stepperSetAcceleration	16	static
+stepper.c:81:6:stepperGetDistanceToGo	16	static
+stepper.c:85:6:stepperSetCurrentPosition	16	static
+stepper.c:93:6:stepperRun	16	static
+stepper.c:97:6:stepperStop	16	static
+stepper.c:101:6:stepperGetTargetPosition	16	static
+stepper.c:105:6:stepperSetAbsoluteTartePosition	16	static
+stepper.c:109:6:stepperSetRelativeTargetPosition	16	static
+stepper.c:113:6:stepperComputeNewSpeed	40	static

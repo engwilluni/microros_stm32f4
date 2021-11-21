@@ -11,6 +11,7 @@ C_SRCS += \
 ../Core/Src/main.c \
 ../Core/Src/microros_allocators.c \
 ../Core/Src/microros_time.c \
+../Core/Src/stepper.c \
 ../Core/Src/stm32f4xx_hal_msp.c \
 ../Core/Src/stm32f4xx_hal_timebase_tim.c \
 ../Core/Src/stm32f4xx_it.c \
@@ -25,6 +26,7 @@ OBJS += \
 ./Core/Src/main.o \
 ./Core/Src/microros_allocators.o \
 ./Core/Src/microros_time.o \
+./Core/Src/stepper.o \
 ./Core/Src/stm32f4xx_hal_msp.o \
 ./Core/Src/stm32f4xx_hal_timebase_tim.o \
 ./Core/Src/stm32f4xx_it.o \
@@ -39,6 +41,7 @@ C_DEPS += \
 ./Core/Src/main.d \
 ./Core/Src/microros_allocators.d \
 ./Core/Src/microros_time.d \
+./Core/Src/stepper.d \
 ./Core/Src/stm32f4xx_hal_msp.d \
 ./Core/Src/stm32f4xx_hal_timebase_tim.d \
 ./Core/Src/stm32f4xx_it.d \

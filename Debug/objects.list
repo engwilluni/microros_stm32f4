@@ -4,6 +4,7 @@
 "./Core/Src/main.o"
 "./Core/Src/microros_allocators.o"
 "./Core/Src/microros_time.o"
+"./Core/Src/stepper.o"
 "./Core/Src/stm32f4xx_hal_msp.o"
 "./Core/Src/stm32f4xx_hal_timebase_tim.o"
 "./Core/Src/stm32f4xx_it.o"

@@ -95,8 +95,10 @@ void Error_Handler(void);
 #define STEPPER_EN_GPIO_Port GPIOE
 #define STEPPER_DIR_Pin GPIO_PIN_8
 #define STEPPER_DIR_GPIO_Port GPIOE
-#define STEPPER_PUL_Pin GPIO_PIN_9
-#define STEPPER_PUL_GPIO_Port GPIOE
+#define MS1_Pin GPIO_PIN_9
+#define MS1_GPIO_Port GPIOE
+#define MS2_Pin GPIO_PIN_10
+#define MS2_GPIO_Port GPIOE
 #define CLK_IN_Pin GPIO_PIN_10
 #define CLK_IN_GPIO_Port GPIOB
 #define GPS_USART_RX_Pin GPIO_PIN_11
