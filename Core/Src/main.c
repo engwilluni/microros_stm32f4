@@ -50,7 +50,9 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TF_GPS_DATA 1
+#define TF_GPS_DATA 1<<0
+#define TF_STEPPER_INT 1<<0
+#define TF_STEPPER_DATA 1<<1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -875,7 +877,7 @@ void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 		rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub, &ros2_gpio_input_msg, NULL);
 		if (ret != RCL_RET_OK)
 		{
-		  printf("Error publishing gpio input (line %d)\n", __LINE__);
+		  printf("Error publishing gpio inputs (line %d)\n", __LINE__);
 		}
 }
 
@@ -943,6 +945,7 @@ void ros2_stepper_target_position_callback(const void * msgin){
 
 			stepper_target_position_msg = (const std_msgs__msg__UInt32 *)msgin;
 			stepper1.targetPos = stepper_target_position_msg->data;
+			osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
 
 		}
 }
@@ -989,6 +992,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 			stepper1.currentPos--;
 			HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, GPIO_PIN_RESET);
 		}
+		osThreadFlagsSet(task_stepperHandle, TF_STEPPER_INT);
 
 	}
 }
@@ -1240,6 +1244,7 @@ void task_gps_function(void *argument)
 void task_stepper_function(void *argument)
 {
   /* USER CODE BEGIN task_stepper_function */
+	uint32_t flags;
 	stepperInit(&stepper1);
 
 	stepperSetSpeed(&stepper1, 1);
@@ -1253,9 +1258,17 @@ void task_stepper_function(void *argument)
   for(;;)
   {
 
-	  stepperComputeNewSpeed(&stepper1);
+	  flags = osThreadFlagsWait((TF_STEPPER_INT | TF_STEPPER_DATA), osFlagsWaitAny, osWaitForever);
+	  if ((flags & TF_STEPPER_INT) == TF_STEPPER_INT){
+		  stepperComputeNewSpeed(&stepper1);
+		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
+	  }
 
-	  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
+	  if ((flags & TF_STEPPER_DATA) == TF_STEPPER_DATA){
+		  stepperComputeNewSpeed(&stepper1);
+		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
+	  }
+
 
 
     osDelay(1);
