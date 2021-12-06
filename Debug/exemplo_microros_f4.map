@@ -9248,30 +9248,31 @@ LOAD /opt/st/stm32cubeide_1.7.0/plugins/com.st.stm32cube.ide.mcu.externaltools.g
                 0x0000000008002794      0x104 ./Core/Src/main.o
                 0x0000000008002794                task_gps_function
  .text.task_stepper_function
-                0x0000000008002898       0xcc ./Core/Src/main.o
+                0x0000000008002898       0xc8 ./Core/Src/main.o
                 0x0000000008002898                task_stepper_function
  .text.task_main_function
-                0x0000000008002964       0xa4 ./Core/Src/main.o
-                0x0000000008002964                task_main_function
+                0x0000000008002960       0xa4 ./Core/Src/main.o
+                0x0000000008002960                task_main_function
  .text.HAL_TIM_PeriodElapsedCallback
-                0x0000000008002a08       0x24 ./Core/Src/main.o
-                0x0000000008002a08                HAL_TIM_PeriodElapsedCallback
+                0x0000000008002a04       0x24 ./Core/Src/main.o
+                0x0000000008002a04                HAL_TIM_PeriodElapsedCallback
  .text.Error_Handler
-                0x0000000008002a2c        0xa ./Core/Src/main.o
-                0x0000000008002a2c                Error_Handler
- *fill*         0x0000000008002a36        0x2 
+                0x0000000008002a28        0xa ./Core/Src/main.o
+                0x0000000008002a28                Error_Handler
+ *fill*         0x0000000008002a32        0x2 
  .text.microros_allocate
-                0x0000000008002a38       0x44 ./Core/Src/microros_allocators.o
-                0x0000000008002a38                microros_allocate
+                0x0000000008002a34       0x44 ./Core/Src/microros_allocators.o
+                0x0000000008002a34                microros_allocate
  .text.microros_deallocate
-                0x0000000008002a7c       0x38 ./Core/Src/microros_allocators.o
-                0x0000000008002a7c                microros_deallocate
+                0x0000000008002a78       0x38 ./Core/Src/microros_allocators.o
+                0x0000000008002a78                microros_deallocate
  .text.microros_reallocate
-                0x0000000008002ab4       0x6c ./Core/Src/microros_allocators.o
-                0x0000000008002ab4                microros_reallocate
+                0x0000000008002ab0       0x6c ./Core/Src/microros_allocators.o
+                0x0000000008002ab0                microros_reallocate
  .text.microros_zero_allocate
-                0x0000000008002b20       0x50 ./Core/Src/microros_allocators.o
-                0x0000000008002b20                microros_zero_allocate
+                0x0000000008002b1c       0x50 ./Core/Src/microros_allocators.o
+                0x0000000008002b1c                microros_zero_allocate
+ *fill*         0x0000000008002b6c        0x4 
  .text.UTILS_NanosecondsToTimespec
                 0x0000000008002b70       0xa0 ./Core/Src/microros_time.o
                 0x0000000008002b70                UTILS_NanosecondsToTimespec

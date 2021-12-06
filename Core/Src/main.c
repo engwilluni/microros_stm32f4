@@ -1223,8 +1223,9 @@ void task_stepper_function(void *argument)
 
 	stepperSetSpeed(&stepper, 1);
 	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
-	stepperSetAcceleration(&stepper, 1000);
-	stepperSetMaxSpeed(&stepper, 240);
+	stepperSetAcceleration(&stepper, 48*2*4);
+	// Motor = 7.5°/Step, 1/4 Microstepping, speed =  2rev/s,
+	stepperSetMaxSpeed(&stepper, 2*4*48);
 	stepperSetAbsoluteTartePosition(&stepper, 0);
 	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
 	 HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);

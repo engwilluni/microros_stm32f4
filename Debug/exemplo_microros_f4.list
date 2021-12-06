@@ -2673,7 +2673,7 @@ int main(void)
  80017a8:	08002899 	.word	0x08002899
  80017ac:	20010858 	.word	0x20010858
  80017b0:	0801f67c 	.word	0x0801f67c
- 80017b4:	08002965 	.word	0x08002965
+ 80017b4:	08002961 	.word	0x08002961
  80017b8:	200108fc 	.word	0x200108fc
 
 080017bc <SystemClock_Config>:
@@ -2765,7 +2765,7 @@ void SystemClock_Config(void)
  800184c:	d001      	beq.n	8001852 <SystemClock_Config+0x96>
   {
     Error_Handler();
- 800184e:	f001 f8ed 	bl	8002a2c <Error_Handler>
+ 800184e:	f001 f8eb 	bl	8002a28 <Error_Handler>
   }
   /** Initializes the CPU, AHB and APB buses clocks
   */
@@ -2796,7 +2796,7 @@ void SystemClock_Config(void)
  800187a:	d001      	beq.n	8001880 <SystemClock_Config+0xc4>
   {
     Error_Handler();
- 800187c:	f001 f8d6 	bl	8002a2c <Error_Handler>
+ 800187c:	f001 f8d4 	bl	8002a28 <Error_Handler>
   }
 }
  8001880:	bf00      	nop
@@ -2889,7 +2889,7 @@ static void MX_ADC1_Init(void)
  80018fa:	d001      	beq.n	8001900 <MX_ADC1_Init+0x70>
   {
     Error_Handler();
- 80018fc:	f001 f896 	bl	8002a2c <Error_Handler>
+ 80018fc:	f001 f894 	bl	8002a28 <Error_Handler>
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
@@ -2912,7 +2912,7 @@ static void MX_ADC1_Init(void)
  800191a:	d001      	beq.n	8001920 <MX_ADC1_Init+0x90>
   {
     Error_Handler();
- 800191c:	f001 f886 	bl	8002a2c <Error_Handler>
+ 800191c:	f001 f884 	bl	8002a28 <Error_Handler>
   }
   /** Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time.
   */
@@ -2932,7 +2932,7 @@ static void MX_ADC1_Init(void)
  8001936:	d001      	beq.n	800193c <MX_ADC1_Init+0xac>
   {
     Error_Handler();
- 8001938:	f001 f878 	bl	8002a2c <Error_Handler>
+ 8001938:	f001 f876 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN ADC1_Init 2 */
 
@@ -3005,7 +3005,7 @@ static void MX_I2C1_Init(void)
  8001996:	d001      	beq.n	800199c <MX_I2C1_Init+0x4c>
   {
     Error_Handler();
- 8001998:	f001 f848 	bl	8002a2c <Error_Handler>
+ 8001998:	f001 f846 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN I2C1_Init 2 */
 
@@ -3076,7 +3076,7 @@ static void MX_I2S3_Init(void)
  80019f4:	d001      	beq.n	80019fa <MX_I2S3_Init+0x4e>
   {
     Error_Handler();
- 80019f6:	f001 f819 	bl	8002a2c <Error_Handler>
+ 80019f6:	f001 f817 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN I2S3_Init 2 */
 
@@ -3160,7 +3160,7 @@ static void MX_SPI1_Init(void)
  8001a66:	d001      	beq.n	8001a6c <MX_SPI1_Init+0x60>
   {
     Error_Handler();
- 8001a68:	f000 ffe0 	bl	8002a2c <Error_Handler>
+ 8001a68:	f000 ffde 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN SPI1_Init 2 */
 
@@ -3245,7 +3245,7 @@ static void MX_TIM3_Init(void)
  8001ad8:	d001      	beq.n	8001ade <MX_TIM3_Init+0x66>
   {
     Error_Handler();
- 8001ada:	f000 ffa7 	bl	8002a2c <Error_Handler>
+ 8001ada:	f000 ffa5 	bl	8002a28 <Error_Handler>
   }
   sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
  8001ade:	f44f 5380 	mov.w	r3, #4096	; 0x1000
@@ -3260,7 +3260,7 @@ static void MX_TIM3_Init(void)
  8001af4:	d001      	beq.n	8001afa <MX_TIM3_Init+0x82>
   {
     Error_Handler();
- 8001af6:	f000 ff99 	bl	8002a2c <Error_Handler>
+ 8001af6:	f000 ff97 	bl	8002a28 <Error_Handler>
   }
   if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
  8001afa:	4818      	ldr	r0, [pc, #96]	; (8001b5c <MX_TIM3_Init+0xe4>)
@@ -3270,7 +3270,7 @@ static void MX_TIM3_Init(void)
  8001b04:	d001      	beq.n	8001b0a <MX_TIM3_Init+0x92>
   {
     Error_Handler();
- 8001b06:	f000 ff91 	bl	8002a2c <Error_Handler>
+ 8001b06:	f000 ff8f 	bl	8002a28 <Error_Handler>
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
  8001b0a:	2300      	movs	r3, #0
@@ -3288,7 +3288,7 @@ static void MX_TIM3_Init(void)
  8001b22:	d001      	beq.n	8001b28 <MX_TIM3_Init+0xb0>
   {
     Error_Handler();
- 8001b24:	f000 ff82 	bl	8002a2c <Error_Handler>
+ 8001b24:	f000 ff80 	bl	8002a28 <Error_Handler>
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
  8001b28:	2360      	movs	r3, #96	; 0x60
@@ -3313,7 +3313,7 @@ static void MX_TIM3_Init(void)
  8001b48:	d001      	beq.n	8001b4e <MX_TIM3_Init+0xd6>
   {
     Error_Handler();
- 8001b4a:	f000 ff6f 	bl	8002a2c <Error_Handler>
+ 8001b4a:	f000 ff6d 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN TIM3_Init 2 */
 
@@ -3384,7 +3384,7 @@ static void MX_USART2_UART_Init(void)
  8001ba4:	d001      	beq.n	8001baa <MX_USART2_UART_Init+0x46>
   {
     Error_Handler();
- 8001ba6:	f000 ff41 	bl	8002a2c <Error_Handler>
+ 8001ba6:	f000 ff3f 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN USART2_Init 2 */
 
@@ -3451,7 +3451,7 @@ static void MX_USART3_UART_Init(void)
  8001bf8:	d001      	beq.n	8001bfe <MX_USART3_UART_Init+0x46>
   {
     Error_Handler();
- 8001bfa:	f000 ff17 	bl	8002a2c <Error_Handler>
+ 8001bfa:	f000 ff15 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN USART3_Init 2 */
 
@@ -3510,7 +3510,7 @@ static void MX_USB_OTG_FS_HCD_Init(void)
  8001c40:	d001      	beq.n	8001c46 <MX_USB_OTG_FS_HCD_Init+0x3a>
   {
     Error_Handler();
- 8001c42:	f000 fef3 	bl	8002a2c <Error_Handler>
+ 8001c42:	f000 fef1 	bl	8002a28 <Error_Handler>
   }
   /* USER CODE BEGIN USB_OTG_FS_Init 2 */
 
@@ -4846,10 +4846,10 @@ void task_ros2_function(void *argument)
  8002540:	08001585 	.word	0x08001585
  8002544:	08001559 	.word	0x08001559
  8002548:	20010d50 	.word	0x20010d50
- 800254c:	08002a39 	.word	0x08002a39
- 8002550:	08002a7d 	.word	0x08002a7d
- 8002554:	08002ab5 	.word	0x08002ab5
- 8002558:	08002b21 	.word	0x08002b21
+ 800254c:	08002a35 	.word	0x08002a35
+ 8002550:	08002a79 	.word	0x08002a79
+ 8002554:	08002ab1 	.word	0x08002ab1
+ 8002558:	08002b1d 	.word	0x08002b1d
  800255c:	0801e894 	.word	0x0801e894
  8002560:	0801e8bc 	.word	0x0801e8bc
  8002564:	0801e8c0 	.word	0x0801e8c0
@@ -5242,12 +5242,13 @@ void task_stepper_function(void *argument)
  80028be:	461a      	mov	r2, r3
  80028c0:	4b25      	ldr	r3, [pc, #148]	; (8002958 <task_stepper_function+0xc0>)
  80028c2:	60da      	str	r2, [r3, #12]
-	stepperSetAcceleration(&stepper, 1000);
+	stepperSetAcceleration(&stepper, 48*2*4);
  80028c4:	ed9f 0a25 	vldr	s0, [pc, #148]	; 800295c <task_stepper_function+0xc4>
  80028c8:	4822      	ldr	r0, [pc, #136]	; (8002954 <task_stepper_function+0xbc>)
  80028ca:	f000 fb11 	bl	8002ef0 <stepperSetAcceleration>
-	stepperSetMaxSpeed(&stepper, 240);
- 80028ce:	ed9f 0a24 	vldr	s0, [pc, #144]	; 8002960 <task_stepper_function+0xc8>
+	// Motor = 7.5°/Step, 1/4 Microstepping, speed =  2rev/s,
+	stepperSetMaxSpeed(&stepper, 2*4*48);
+ 80028ce:	ed9f 0a23 	vldr	s0, [pc, #140]	; 800295c <task_stepper_function+0xc4>
  80028d2:	4820      	ldr	r0, [pc, #128]	; (8002954 <task_stepper_function+0xbc>)
  80028d4:	f000 fab0 	bl	8002e38 <stepperSetMaxSpeed>
 	stepperSetAbsoluteTartePosition(&stepper, 0);
@@ -5323,346 +5324,346 @@ void task_stepper_function(void *argument)
  8002952:	e7d3      	b.n	80028fc <task_stepper_function+0x64>
  8002954:	2001064c 	.word	0x2001064c
  8002958:	20010864 	.word	0x20010864
- 800295c:	447a0000 	.word	0x447a0000
- 8002960:	43700000 	.word	0x43700000
+ 800295c:	43c00000 	.word	0x43c00000
 
-08002964 <task_main_function>:
+08002960 <task_main_function>:
 * @param argument: Not used
 * @retval None
 */
 /* USER CODE END Header_task_main_function */
 void task_main_function(void *argument)
 {
- 8002964:	b580      	push	{r7, lr}
- 8002966:	b084      	sub	sp, #16
- 8002968:	af00      	add	r7, sp, #0
- 800296a:	6078      	str	r0, [r7, #4]
+ 8002960:	b580      	push	{r7, lr}
+ 8002962:	b084      	sub	sp, #16
+ 8002964:	af00      	add	r7, sp, #0
+ 8002966:	6078      	str	r0, [r7, #4]
   /* USER CODE BEGIN task_main_function */
 	uint32_t flags  = 0;
- 800296c:	2300      	movs	r3, #0
- 800296e:	60fb      	str	r3, [r7, #12]
+ 8002968:	2300      	movs	r3, #0
+ 800296a:	60fb      	str	r3, [r7, #12]
   /* Infinite loop */
   for(;;)
   {
 
 	  flags = osThreadFlagsWait(TF_MAIN_ROS_CMD, osFlagsWaitAny, 0);
- 8002970:	2200      	movs	r2, #0
- 8002972:	2100      	movs	r1, #0
- 8002974:	2001      	movs	r0, #1
- 8002976:	f008 fc5d 	bl	800b234 <osThreadFlagsWait>
- 800297a:	60f8      	str	r0, [r7, #12]
+ 800296c:	2200      	movs	r2, #0
+ 800296e:	2100      	movs	r1, #0
+ 8002970:	2001      	movs	r0, #1
+ 8002972:	f008 fc5f 	bl	800b234 <osThreadFlagsWait>
+ 8002976:	60f8      	str	r0, [r7, #12]
 	  if ((flags & TF_MAIN_ROS_CMD) == TF_MAIN_ROS_CMD){
- 800297c:	68fb      	ldr	r3, [r7, #12]
- 800297e:	f003 0301 	and.w	r3, r3, #1
- 8002982:	2b00      	cmp	r3, #0
- 8002984:	d00f      	beq.n	80029a6 <task_main_function+0x42>
+ 8002978:	68fb      	ldr	r3, [r7, #12]
+ 800297a:	f003 0301 	and.w	r3, r3, #1
+ 800297e:	2b00      	cmp	r3, #0
+ 8002980:	d00f      	beq.n	80029a2 <task_main_function+0x42>
 		  stepper.targetPos = ros_cmd.stepper_target_position;
- 8002986:	4b19      	ldr	r3, [pc, #100]	; (80029ec <task_main_function+0x88>)
- 8002988:	681b      	ldr	r3, [r3, #0]
- 800298a:	461a      	mov	r2, r3
- 800298c:	4b18      	ldr	r3, [pc, #96]	; (80029f0 <task_main_function+0x8c>)
- 800298e:	605a      	str	r2, [r3, #4]
+ 8002982:	4b19      	ldr	r3, [pc, #100]	; (80029e8 <task_main_function+0x88>)
+ 8002984:	681b      	ldr	r3, [r3, #0]
+ 8002986:	461a      	mov	r2, r3
+ 8002988:	4b18      	ldr	r3, [pc, #96]	; (80029ec <task_main_function+0x8c>)
+ 800298a:	605a      	str	r2, [r3, #4]
 		  osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
- 8002990:	4b18      	ldr	r3, [pc, #96]	; (80029f4 <task_main_function+0x90>)
- 8002992:	681b      	ldr	r3, [r3, #0]
- 8002994:	2102      	movs	r1, #2
- 8002996:	4618      	mov	r0, r3
- 8002998:	f008 fbfe 	bl	800b198 <osThreadFlagsSet>
+ 800298c:	4b18      	ldr	r3, [pc, #96]	; (80029f0 <task_main_function+0x90>)
+ 800298e:	681b      	ldr	r3, [r3, #0]
+ 8002990:	2102      	movs	r1, #2
+ 8002992:	4618      	mov	r0, r3
+ 8002994:	f008 fc00 	bl	800b198 <osThreadFlagsSet>
 		  updateDigitalOuputs(ros_cmd.digital_output);
- 800299c:	4b13      	ldr	r3, [pc, #76]	; (80029ec <task_main_function+0x88>)
- 800299e:	685b      	ldr	r3, [r3, #4]
- 80029a0:	4618      	mov	r0, r3
- 80029a2:	f7ff fca5 	bl	80022f0 <updateDigitalOuputs>
+ 8002998:	4b13      	ldr	r3, [pc, #76]	; (80029e8 <task_main_function+0x88>)
+ 800299a:	685b      	ldr	r3, [r3, #4]
+ 800299c:	4618      	mov	r0, r3
+ 800299e:	f7ff fca7 	bl	80022f0 <updateDigitalOuputs>
 
 	  }
 	  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
- 80029a6:	4b14      	ldr	r3, [pc, #80]	; (80029f8 <task_main_function+0x94>)
- 80029a8:	681b      	ldr	r3, [r3, #0]
- 80029aa:	f04f 31ff 	mov.w	r1, #4294967295	; 0xffffffff
- 80029ae:	4618      	mov	r0, r3
- 80029b0:	f008 fd62 	bl	800b478 <osMutexAcquire>
+ 80029a2:	4b14      	ldr	r3, [pc, #80]	; (80029f4 <task_main_function+0x94>)
+ 80029a4:	681b      	ldr	r3, [r3, #0]
+ 80029a6:	f04f 31ff 	mov.w	r1, #4294967295	; 0xffffffff
+ 80029aa:	4618      	mov	r0, r3
+ 80029ac:	f008 fd64 	bl	800b478 <osMutexAcquire>
 	  sensor_data.digital_input = HAL_GPIO_ReadPin(PB0_GPIO_Port, PB0_Pin);
- 80029b4:	2101      	movs	r1, #1
- 80029b6:	4811      	ldr	r0, [pc, #68]	; (80029fc <task_main_function+0x98>)
- 80029b8:	f002 fca8 	bl	800530c <HAL_GPIO_ReadPin>
- 80029bc:	4603      	mov	r3, r0
- 80029be:	461a      	mov	r2, r3
- 80029c0:	4b0f      	ldr	r3, [pc, #60]	; (8002a00 <task_main_function+0x9c>)
- 80029c2:	601a      	str	r2, [r3, #0]
+ 80029b0:	2101      	movs	r1, #1
+ 80029b2:	4811      	ldr	r0, [pc, #68]	; (80029f8 <task_main_function+0x98>)
+ 80029b4:	f002 fcaa 	bl	800530c <HAL_GPIO_ReadPin>
+ 80029b8:	4603      	mov	r3, r0
+ 80029ba:	461a      	mov	r2, r3
+ 80029bc:	4b0f      	ldr	r3, [pc, #60]	; (80029fc <task_main_function+0x9c>)
+ 80029be:	601a      	str	r2, [r3, #0]
 	  sensor_data.analog_input[0] = adc_values[0];
- 80029c4:	4b0f      	ldr	r3, [pc, #60]	; (8002a04 <task_main_function+0xa0>)
- 80029c6:	881b      	ldrh	r3, [r3, #0]
- 80029c8:	461a      	mov	r2, r3
- 80029ca:	4b0d      	ldr	r3, [pc, #52]	; (8002a00 <task_main_function+0x9c>)
- 80029cc:	605a      	str	r2, [r3, #4]
+ 80029c0:	4b0f      	ldr	r3, [pc, #60]	; (8002a00 <task_main_function+0xa0>)
+ 80029c2:	881b      	ldrh	r3, [r3, #0]
+ 80029c4:	461a      	mov	r2, r3
+ 80029c6:	4b0d      	ldr	r3, [pc, #52]	; (80029fc <task_main_function+0x9c>)
+ 80029c8:	605a      	str	r2, [r3, #4]
 	  sensor_data.analog_input[1] = adc_values[1];
- 80029ce:	4b0d      	ldr	r3, [pc, #52]	; (8002a04 <task_main_function+0xa0>)
- 80029d0:	885b      	ldrh	r3, [r3, #2]
- 80029d2:	461a      	mov	r2, r3
- 80029d4:	4b0a      	ldr	r3, [pc, #40]	; (8002a00 <task_main_function+0x9c>)
- 80029d6:	609a      	str	r2, [r3, #8]
+ 80029ca:	4b0d      	ldr	r3, [pc, #52]	; (8002a00 <task_main_function+0xa0>)
+ 80029cc:	885b      	ldrh	r3, [r3, #2]
+ 80029ce:	461a      	mov	r2, r3
+ 80029d0:	4b0a      	ldr	r3, [pc, #40]	; (80029fc <task_main_function+0x9c>)
+ 80029d2:	609a      	str	r2, [r3, #8]
 	  osMutexRelease(sensorDataMutexHandle);
- 80029d8:	4b07      	ldr	r3, [pc, #28]	; (80029f8 <task_main_function+0x94>)
- 80029da:	681b      	ldr	r3, [r3, #0]
- 80029dc:	4618      	mov	r0, r3
- 80029de:	f008 fd96 	bl	800b50e <osMutexRelease>
+ 80029d4:	4b07      	ldr	r3, [pc, #28]	; (80029f4 <task_main_function+0x94>)
+ 80029d6:	681b      	ldr	r3, [r3, #0]
+ 80029d8:	4618      	mov	r0, r3
+ 80029da:	f008 fd98 	bl	800b50e <osMutexRelease>
 
     osDelay(50);
- 80029e2:	2032      	movs	r0, #50	; 0x32
- 80029e4:	f008 fca7 	bl	800b336 <osDelay>
+ 80029de:	2032      	movs	r0, #50	; 0x32
+ 80029e0:	f008 fca9 	bl	800b336 <osDelay>
 	  flags = osThreadFlagsWait(TF_MAIN_ROS_CMD, osFlagsWaitAny, 0);
- 80029e8:	e7c2      	b.n	8002970 <task_main_function+0xc>
- 80029ea:	bf00      	nop
- 80029ec:	200105fc 	.word	0x200105fc
- 80029f0:	2001064c 	.word	0x2001064c
- 80029f4:	20010858 	.word	0x20010858
- 80029f8:	200108ac 	.word	0x200108ac
- 80029fc:	40020000 	.word	0x40020000
- 8002a00:	20010558 	.word	0x20010558
- 8002a04:	20010de8 	.word	0x20010de8
+ 80029e4:	e7c2      	b.n	800296c <task_main_function+0xc>
+ 80029e6:	bf00      	nop
+ 80029e8:	200105fc 	.word	0x200105fc
+ 80029ec:	2001064c 	.word	0x2001064c
+ 80029f0:	20010858 	.word	0x20010858
+ 80029f4:	200108ac 	.word	0x200108ac
+ 80029f8:	40020000 	.word	0x40020000
+ 80029fc:	20010558 	.word	0x20010558
+ 8002a00:	20010de8 	.word	0x20010de8
 
-08002a08 <HAL_TIM_PeriodElapsedCallback>:
+08002a04 <HAL_TIM_PeriodElapsedCallback>:
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
   * @retval None
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
- 8002a08:	b580      	push	{r7, lr}
- 8002a0a:	b082      	sub	sp, #8
- 8002a0c:	af00      	add	r7, sp, #0
- 8002a0e:	6078      	str	r0, [r7, #4]
+ 8002a04:	b580      	push	{r7, lr}
+ 8002a06:	b082      	sub	sp, #8
+ 8002a08:	af00      	add	r7, sp, #0
+ 8002a0a:	6078      	str	r0, [r7, #4]
   /* USER CODE BEGIN Callback 0 */
 
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM7) {
- 8002a10:	687b      	ldr	r3, [r7, #4]
- 8002a12:	681b      	ldr	r3, [r3, #0]
- 8002a14:	4a04      	ldr	r2, [pc, #16]	; (8002a28 <HAL_TIM_PeriodElapsedCallback+0x20>)
- 8002a16:	4293      	cmp	r3, r2
- 8002a18:	d101      	bne.n	8002a1e <HAL_TIM_PeriodElapsedCallback+0x16>
+ 8002a0c:	687b      	ldr	r3, [r7, #4]
+ 8002a0e:	681b      	ldr	r3, [r3, #0]
+ 8002a10:	4a04      	ldr	r2, [pc, #16]	; (8002a24 <HAL_TIM_PeriodElapsedCallback+0x20>)
+ 8002a12:	4293      	cmp	r3, r2
+ 8002a14:	d101      	bne.n	8002a1a <HAL_TIM_PeriodElapsedCallback+0x16>
     HAL_IncTick();
- 8002a1a:	f001 f9a1 	bl	8003d60 <HAL_IncTick>
+ 8002a16:	f001 f9a3 	bl	8003d60 <HAL_IncTick>
   }
   /* USER CODE BEGIN Callback 1 */
 
   /* USER CODE END Callback 1 */
 }
- 8002a1e:	bf00      	nop
- 8002a20:	3708      	adds	r7, #8
- 8002a22:	46bd      	mov	sp, r7
- 8002a24:	bd80      	pop	{r7, pc}
- 8002a26:	bf00      	nop
- 8002a28:	40001400 	.word	0x40001400
+ 8002a1a:	bf00      	nop
+ 8002a1c:	3708      	adds	r7, #8
+ 8002a1e:	46bd      	mov	sp, r7
+ 8002a20:	bd80      	pop	{r7, pc}
+ 8002a22:	bf00      	nop
+ 8002a24:	40001400 	.word	0x40001400
 
-08002a2c <Error_Handler>:
+08002a28 <Error_Handler>:
 /**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
 void Error_Handler(void)
 {
- 8002a2c:	b480      	push	{r7}
- 8002a2e:	af00      	add	r7, sp, #0
+ 8002a28:	b480      	push	{r7}
+ 8002a2a:	af00      	add	r7, sp, #0
   __ASM volatile ("cpsid i" : : : "memory");
- 8002a30:	b672      	cpsid	i
+ 8002a2c:	b672      	cpsid	i
 }
- 8002a32:	bf00      	nop
+ 8002a2e:	bf00      	nop
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)
- 8002a34:	e7fe      	b.n	8002a34 <Error_Handler+0x8>
+ 8002a30:	e7fe      	b.n	8002a30 <Error_Handler+0x8>
 	...
 
-08002a38 <microros_allocate>:
+08002a34 <microros_allocate>:
 void vPortFreeMicroROS( void *pv );
 void *pvPortReallocMicroROS( void *pv, size_t xWantedSize );
 size_t getBlockSize( void *pv );
 void *pvPortCallocMicroROS( size_t num, size_t xWantedSize );
 
 void * microros_allocate(size_t size, void * state){
- 8002a38:	b580      	push	{r7, lr}
- 8002a3a:	b082      	sub	sp, #8
- 8002a3c:	af00      	add	r7, sp, #0
- 8002a3e:	6078      	str	r0, [r7, #4]
- 8002a40:	6039      	str	r1, [r7, #0]
+ 8002a34:	b580      	push	{r7, lr}
+ 8002a36:	b082      	sub	sp, #8
+ 8002a38:	af00      	add	r7, sp, #0
+ 8002a3a:	6078      	str	r0, [r7, #4]
+ 8002a3c:	6039      	str	r1, [r7, #0]
   (void) state;
   // printf("-- Alloc %d (prev: %d B)\n",size, xPortGetFreeHeapSize());
   absoluteUsedMemory += size;
- 8002a42:	4b0c      	ldr	r3, [pc, #48]	; (8002a74 <microros_allocate+0x3c>)
- 8002a44:	681b      	ldr	r3, [r3, #0]
- 8002a46:	461a      	mov	r2, r3
- 8002a48:	687b      	ldr	r3, [r7, #4]
- 8002a4a:	4413      	add	r3, r2
- 8002a4c:	461a      	mov	r2, r3
- 8002a4e:	4b09      	ldr	r3, [pc, #36]	; (8002a74 <microros_allocate+0x3c>)
- 8002a50:	601a      	str	r2, [r3, #0]
+ 8002a3e:	4b0c      	ldr	r3, [pc, #48]	; (8002a70 <microros_allocate+0x3c>)
+ 8002a40:	681b      	ldr	r3, [r3, #0]
+ 8002a42:	461a      	mov	r2, r3
+ 8002a44:	687b      	ldr	r3, [r7, #4]
+ 8002a46:	4413      	add	r3, r2
+ 8002a48:	461a      	mov	r2, r3
+ 8002a4a:	4b09      	ldr	r3, [pc, #36]	; (8002a70 <microros_allocate+0x3c>)
+ 8002a4c:	601a      	str	r2, [r3, #0]
   usedMemory += size;
- 8002a52:	4b09      	ldr	r3, [pc, #36]	; (8002a78 <microros_allocate+0x40>)
- 8002a54:	681b      	ldr	r3, [r3, #0]
- 8002a56:	461a      	mov	r2, r3
- 8002a58:	687b      	ldr	r3, [r7, #4]
- 8002a5a:	4413      	add	r3, r2
- 8002a5c:	461a      	mov	r2, r3
- 8002a5e:	4b06      	ldr	r3, [pc, #24]	; (8002a78 <microros_allocate+0x40>)
- 8002a60:	601a      	str	r2, [r3, #0]
+ 8002a4e:	4b09      	ldr	r3, [pc, #36]	; (8002a74 <microros_allocate+0x40>)
+ 8002a50:	681b      	ldr	r3, [r3, #0]
+ 8002a52:	461a      	mov	r2, r3
+ 8002a54:	687b      	ldr	r3, [r7, #4]
+ 8002a56:	4413      	add	r3, r2
+ 8002a58:	461a      	mov	r2, r3
+ 8002a5a:	4b06      	ldr	r3, [pc, #24]	; (8002a74 <microros_allocate+0x40>)
+ 8002a5c:	601a      	str	r2, [r3, #0]
   return pvPortMallocMicroROS(size);
- 8002a62:	6878      	ldr	r0, [r7, #4]
- 8002a64:	f7fe fb22 	bl	80010ac <pvPortMallocMicroROS>
- 8002a68:	4603      	mov	r3, r0
+ 8002a5e:	6878      	ldr	r0, [r7, #4]
+ 8002a60:	f7fe fb24 	bl	80010ac <pvPortMallocMicroROS>
+ 8002a64:	4603      	mov	r3, r0
 }
- 8002a6a:	4618      	mov	r0, r3
- 8002a6c:	3708      	adds	r7, #8
- 8002a6e:	46bd      	mov	sp, r7
- 8002a70:	bd80      	pop	{r7, pc}
- 8002a72:	bf00      	nop
- 8002a74:	20008100 	.word	0x20008100
- 8002a78:	20008104 	.word	0x20008104
+ 8002a66:	4618      	mov	r0, r3
+ 8002a68:	3708      	adds	r7, #8
+ 8002a6a:	46bd      	mov	sp, r7
+ 8002a6c:	bd80      	pop	{r7, pc}
+ 8002a6e:	bf00      	nop
+ 8002a70:	20008100 	.word	0x20008100
+ 8002a74:	20008104 	.word	0x20008104
 
-08002a7c <microros_deallocate>:
+08002a78 <microros_deallocate>:
 
 void microros_deallocate(void * pointer, void * state){
- 8002a7c:	b580      	push	{r7, lr}
- 8002a7e:	b082      	sub	sp, #8
- 8002a80:	af00      	add	r7, sp, #0
- 8002a82:	6078      	str	r0, [r7, #4]
- 8002a84:	6039      	str	r1, [r7, #0]
+ 8002a78:	b580      	push	{r7, lr}
+ 8002a7a:	b082      	sub	sp, #8
+ 8002a7c:	af00      	add	r7, sp, #0
+ 8002a7e:	6078      	str	r0, [r7, #4]
+ 8002a80:	6039      	str	r1, [r7, #0]
   (void) state;
   // printf("-- Free %d (prev: %d B)\n",getBlockSize(pointer), xPortGetFreeHeapSize());
   if (NULL != pointer){
- 8002a86:	687b      	ldr	r3, [r7, #4]
- 8002a88:	2b00      	cmp	r3, #0
- 8002a8a:	d00c      	beq.n	8002aa6 <microros_deallocate+0x2a>
+ 8002a82:	687b      	ldr	r3, [r7, #4]
+ 8002a84:	2b00      	cmp	r3, #0
+ 8002a86:	d00c      	beq.n	8002aa2 <microros_deallocate+0x2a>
     usedMemory -= getBlockSize(pointer);
- 8002a8c:	6878      	ldr	r0, [r7, #4]
- 8002a8e:	f7fe fc2b 	bl	80012e8 <getBlockSize>
- 8002a92:	4603      	mov	r3, r0
- 8002a94:	4a06      	ldr	r2, [pc, #24]	; (8002ab0 <microros_deallocate+0x34>)
- 8002a96:	6812      	ldr	r2, [r2, #0]
- 8002a98:	1ad3      	subs	r3, r2, r3
- 8002a9a:	461a      	mov	r2, r3
- 8002a9c:	4b04      	ldr	r3, [pc, #16]	; (8002ab0 <microros_deallocate+0x34>)
- 8002a9e:	601a      	str	r2, [r3, #0]
+ 8002a88:	6878      	ldr	r0, [r7, #4]
+ 8002a8a:	f7fe fc2d 	bl	80012e8 <getBlockSize>
+ 8002a8e:	4603      	mov	r3, r0
+ 8002a90:	4a06      	ldr	r2, [pc, #24]	; (8002aac <microros_deallocate+0x34>)
+ 8002a92:	6812      	ldr	r2, [r2, #0]
+ 8002a94:	1ad3      	subs	r3, r2, r3
+ 8002a96:	461a      	mov	r2, r3
+ 8002a98:	4b04      	ldr	r3, [pc, #16]	; (8002aac <microros_deallocate+0x34>)
+ 8002a9a:	601a      	str	r2, [r3, #0]
     vPortFreeMicroROS(pointer);
- 8002aa0:	6878      	ldr	r0, [r7, #4]
- 8002aa2:	f7fe fbc7 	bl	8001234 <vPortFreeMicroROS>
+ 8002a9c:	6878      	ldr	r0, [r7, #4]
+ 8002a9e:	f7fe fbc9 	bl	8001234 <vPortFreeMicroROS>
   }
 }
- 8002aa6:	bf00      	nop
- 8002aa8:	3708      	adds	r7, #8
- 8002aaa:	46bd      	mov	sp, r7
- 8002aac:	bd80      	pop	{r7, pc}
- 8002aae:	bf00      	nop
- 8002ab0:	20008104 	.word	0x20008104
+ 8002aa2:	bf00      	nop
+ 8002aa4:	3708      	adds	r7, #8
+ 8002aa6:	46bd      	mov	sp, r7
+ 8002aa8:	bd80      	pop	{r7, pc}
+ 8002aaa:	bf00      	nop
+ 8002aac:	20008104 	.word	0x20008104
 
-08002ab4 <microros_reallocate>:
+08002ab0 <microros_reallocate>:
 
 void * microros_reallocate(void * pointer, size_t size, void * state){
- 8002ab4:	b580      	push	{r7, lr}
- 8002ab6:	b084      	sub	sp, #16
- 8002ab8:	af00      	add	r7, sp, #0
- 8002aba:	60f8      	str	r0, [r7, #12]
- 8002abc:	60b9      	str	r1, [r7, #8]
- 8002abe:	607a      	str	r2, [r7, #4]
+ 8002ab0:	b580      	push	{r7, lr}
+ 8002ab2:	b084      	sub	sp, #16
+ 8002ab4:	af00      	add	r7, sp, #0
+ 8002ab6:	60f8      	str	r0, [r7, #12]
+ 8002ab8:	60b9      	str	r1, [r7, #8]
+ 8002aba:	607a      	str	r2, [r7, #4]
   (void) state;
   // printf("-- Realloc %d -> %d (prev: %d B)\n",getBlockSize(pointer),size, xPortGetFreeHeapSize());
   absoluteUsedMemory += size;
- 8002ac0:	4b15      	ldr	r3, [pc, #84]	; (8002b18 <microros_reallocate+0x64>)
- 8002ac2:	681b      	ldr	r3, [r3, #0]
- 8002ac4:	461a      	mov	r2, r3
- 8002ac6:	68bb      	ldr	r3, [r7, #8]
- 8002ac8:	4413      	add	r3, r2
- 8002aca:	461a      	mov	r2, r3
- 8002acc:	4b12      	ldr	r3, [pc, #72]	; (8002b18 <microros_reallocate+0x64>)
- 8002ace:	601a      	str	r2, [r3, #0]
+ 8002abc:	4b15      	ldr	r3, [pc, #84]	; (8002b14 <microros_reallocate+0x64>)
+ 8002abe:	681b      	ldr	r3, [r3, #0]
+ 8002ac0:	461a      	mov	r2, r3
+ 8002ac2:	68bb      	ldr	r3, [r7, #8]
+ 8002ac4:	4413      	add	r3, r2
+ 8002ac6:	461a      	mov	r2, r3
+ 8002ac8:	4b12      	ldr	r3, [pc, #72]	; (8002b14 <microros_reallocate+0x64>)
+ 8002aca:	601a      	str	r2, [r3, #0]
   usedMemory += size;
- 8002ad0:	4b12      	ldr	r3, [pc, #72]	; (8002b1c <microros_reallocate+0x68>)
- 8002ad2:	681b      	ldr	r3, [r3, #0]
- 8002ad4:	461a      	mov	r2, r3
- 8002ad6:	68bb      	ldr	r3, [r7, #8]
- 8002ad8:	4413      	add	r3, r2
- 8002ada:	461a      	mov	r2, r3
- 8002adc:	4b0f      	ldr	r3, [pc, #60]	; (8002b1c <microros_reallocate+0x68>)
- 8002ade:	601a      	str	r2, [r3, #0]
+ 8002acc:	4b12      	ldr	r3, [pc, #72]	; (8002b18 <microros_reallocate+0x68>)
+ 8002ace:	681b      	ldr	r3, [r3, #0]
+ 8002ad0:	461a      	mov	r2, r3
+ 8002ad2:	68bb      	ldr	r3, [r7, #8]
+ 8002ad4:	4413      	add	r3, r2
+ 8002ad6:	461a      	mov	r2, r3
+ 8002ad8:	4b0f      	ldr	r3, [pc, #60]	; (8002b18 <microros_reallocate+0x68>)
+ 8002ada:	601a      	str	r2, [r3, #0]
   if (NULL == pointer){
- 8002ae0:	68fb      	ldr	r3, [r7, #12]
- 8002ae2:	2b00      	cmp	r3, #0
- 8002ae4:	d104      	bne.n	8002af0 <microros_reallocate+0x3c>
+ 8002adc:	68fb      	ldr	r3, [r7, #12]
+ 8002ade:	2b00      	cmp	r3, #0
+ 8002ae0:	d104      	bne.n	8002aec <microros_reallocate+0x3c>
     return pvPortMallocMicroROS(size);
- 8002ae6:	68b8      	ldr	r0, [r7, #8]
- 8002ae8:	f7fe fae0 	bl	80010ac <pvPortMallocMicroROS>
- 8002aec:	4603      	mov	r3, r0
- 8002aee:	e00e      	b.n	8002b0e <microros_reallocate+0x5a>
+ 8002ae2:	68b8      	ldr	r0, [r7, #8]
+ 8002ae4:	f7fe fae2 	bl	80010ac <pvPortMallocMicroROS>
+ 8002ae8:	4603      	mov	r3, r0
+ 8002aea:	e00e      	b.n	8002b0a <microros_reallocate+0x5a>
   } else {
     usedMemory -= getBlockSize(pointer);
- 8002af0:	68f8      	ldr	r0, [r7, #12]
- 8002af2:	f7fe fbf9 	bl	80012e8 <getBlockSize>
- 8002af6:	4603      	mov	r3, r0
- 8002af8:	4a08      	ldr	r2, [pc, #32]	; (8002b1c <microros_reallocate+0x68>)
- 8002afa:	6812      	ldr	r2, [r2, #0]
- 8002afc:	1ad3      	subs	r3, r2, r3
- 8002afe:	461a      	mov	r2, r3
- 8002b00:	4b06      	ldr	r3, [pc, #24]	; (8002b1c <microros_reallocate+0x68>)
- 8002b02:	601a      	str	r2, [r3, #0]
+ 8002aec:	68f8      	ldr	r0, [r7, #12]
+ 8002aee:	f7fe fbfb 	bl	80012e8 <getBlockSize>
+ 8002af2:	4603      	mov	r3, r0
+ 8002af4:	4a08      	ldr	r2, [pc, #32]	; (8002b18 <microros_reallocate+0x68>)
+ 8002af6:	6812      	ldr	r2, [r2, #0]
+ 8002af8:	1ad3      	subs	r3, r2, r3
+ 8002afa:	461a      	mov	r2, r3
+ 8002afc:	4b06      	ldr	r3, [pc, #24]	; (8002b18 <microros_reallocate+0x68>)
+ 8002afe:	601a      	str	r2, [r3, #0]
     return pvPortReallocMicroROS(pointer,size);
- 8002b04:	68b9      	ldr	r1, [r7, #8]
- 8002b06:	68f8      	ldr	r0, [r7, #12]
- 8002b08:	f7fe fc0c 	bl	8001324 <pvPortReallocMicroROS>
- 8002b0c:	4603      	mov	r3, r0
+ 8002b00:	68b9      	ldr	r1, [r7, #8]
+ 8002b02:	68f8      	ldr	r0, [r7, #12]
+ 8002b04:	f7fe fc0e 	bl	8001324 <pvPortReallocMicroROS>
+ 8002b08:	4603      	mov	r3, r0
   }
 }
- 8002b0e:	4618      	mov	r0, r3
- 8002b10:	3710      	adds	r7, #16
- 8002b12:	46bd      	mov	sp, r7
- 8002b14:	bd80      	pop	{r7, pc}
- 8002b16:	bf00      	nop
- 8002b18:	20008100 	.word	0x20008100
- 8002b1c:	20008104 	.word	0x20008104
+ 8002b0a:	4618      	mov	r0, r3
+ 8002b0c:	3710      	adds	r7, #16
+ 8002b0e:	46bd      	mov	sp, r7
+ 8002b10:	bd80      	pop	{r7, pc}
+ 8002b12:	bf00      	nop
+ 8002b14:	20008100 	.word	0x20008100
+ 8002b18:	20008104 	.word	0x20008104
 
-08002b20 <microros_zero_allocate>:
+08002b1c <microros_zero_allocate>:
 
 void * microros_zero_allocate(size_t number_of_elements, size_t size_of_element, void * state){
- 8002b20:	b580      	push	{r7, lr}
- 8002b22:	b084      	sub	sp, #16
- 8002b24:	af00      	add	r7, sp, #0
- 8002b26:	60f8      	str	r0, [r7, #12]
- 8002b28:	60b9      	str	r1, [r7, #8]
- 8002b2a:	607a      	str	r2, [r7, #4]
+ 8002b1c:	b580      	push	{r7, lr}
+ 8002b1e:	b084      	sub	sp, #16
+ 8002b20:	af00      	add	r7, sp, #0
+ 8002b22:	60f8      	str	r0, [r7, #12]
+ 8002b24:	60b9      	str	r1, [r7, #8]
+ 8002b26:	607a      	str	r2, [r7, #4]
   (void) state;
   // printf("-- Calloc %d x %d = %d -> (prev: %d B)\n",number_of_elements,size_of_element, number_of_elements*size_of_element, xPortGetFreeHeapSize());
   absoluteUsedMemory += number_of_elements*size_of_element;
- 8002b2c:	68fb      	ldr	r3, [r7, #12]
- 8002b2e:	68ba      	ldr	r2, [r7, #8]
- 8002b30:	fb02 f303 	mul.w	r3, r2, r3
- 8002b34:	4a0c      	ldr	r2, [pc, #48]	; (8002b68 <microros_zero_allocate+0x48>)
- 8002b36:	6812      	ldr	r2, [r2, #0]
- 8002b38:	4413      	add	r3, r2
- 8002b3a:	461a      	mov	r2, r3
- 8002b3c:	4b0a      	ldr	r3, [pc, #40]	; (8002b68 <microros_zero_allocate+0x48>)
- 8002b3e:	601a      	str	r2, [r3, #0]
+ 8002b28:	68fb      	ldr	r3, [r7, #12]
+ 8002b2a:	68ba      	ldr	r2, [r7, #8]
+ 8002b2c:	fb02 f303 	mul.w	r3, r2, r3
+ 8002b30:	4a0c      	ldr	r2, [pc, #48]	; (8002b64 <microros_zero_allocate+0x48>)
+ 8002b32:	6812      	ldr	r2, [r2, #0]
+ 8002b34:	4413      	add	r3, r2
+ 8002b36:	461a      	mov	r2, r3
+ 8002b38:	4b0a      	ldr	r3, [pc, #40]	; (8002b64 <microros_zero_allocate+0x48>)
+ 8002b3a:	601a      	str	r2, [r3, #0]
   usedMemory += number_of_elements*size_of_element;
- 8002b40:	68fb      	ldr	r3, [r7, #12]
- 8002b42:	68ba      	ldr	r2, [r7, #8]
- 8002b44:	fb02 f303 	mul.w	r3, r2, r3
- 8002b48:	4a08      	ldr	r2, [pc, #32]	; (8002b6c <microros_zero_allocate+0x4c>)
- 8002b4a:	6812      	ldr	r2, [r2, #0]
- 8002b4c:	4413      	add	r3, r2
- 8002b4e:	461a      	mov	r2, r3
- 8002b50:	4b06      	ldr	r3, [pc, #24]	; (8002b6c <microros_zero_allocate+0x4c>)
- 8002b52:	601a      	str	r2, [r3, #0]
+ 8002b3c:	68fb      	ldr	r3, [r7, #12]
+ 8002b3e:	68ba      	ldr	r2, [r7, #8]
+ 8002b40:	fb02 f303 	mul.w	r3, r2, r3
+ 8002b44:	4a08      	ldr	r2, [pc, #32]	; (8002b68 <microros_zero_allocate+0x4c>)
+ 8002b46:	6812      	ldr	r2, [r2, #0]
+ 8002b48:	4413      	add	r3, r2
+ 8002b4a:	461a      	mov	r2, r3
+ 8002b4c:	4b06      	ldr	r3, [pc, #24]	; (8002b68 <microros_zero_allocate+0x4c>)
+ 8002b4e:	601a      	str	r2, [r3, #0]
   return pvPortCallocMicroROS(number_of_elements,size_of_element);
- 8002b54:	68b9      	ldr	r1, [r7, #8]
- 8002b56:	68f8      	ldr	r0, [r7, #12]
- 8002b58:	f7fe fc1e 	bl	8001398 <pvPortCallocMicroROS>
- 8002b5c:	4603      	mov	r3, r0
- 8002b5e:	4618      	mov	r0, r3
- 8002b60:	3710      	adds	r7, #16
- 8002b62:	46bd      	mov	sp, r7
- 8002b64:	bd80      	pop	{r7, pc}
- 8002b66:	bf00      	nop
- 8002b68:	20008100 	.word	0x20008100
- 8002b6c:	20008104 	.word	0x20008104
+ 8002b50:	68b9      	ldr	r1, [r7, #8]
+ 8002b52:	68f8      	ldr	r0, [r7, #12]
+ 8002b54:	f7fe fc20 	bl	8001398 <pvPortCallocMicroROS>
+ 8002b58:	4603      	mov	r3, r0
+ 8002b5a:	4618      	mov	r0, r3
+ 8002b5c:	3710      	adds	r7, #16
+ 8002b5e:	46bd      	mov	sp, r7
+ 8002b60:	bd80      	pop	{r7, pc}
+ 8002b62:	bf00      	nop
+ 8002b64:	20008100 	.word	0x20008100
+ 8002b68:	20008104 	.word	0x20008104
+ 8002b6c:	00000000 	.word	0x00000000
 
 08002b70 <UTILS_NanosecondsToTimespec>:
 #define NANOSECONDS_PER_SECOND     ( 1000000000LL )                                /**< Nanoseconds per second. */
@@ -5908,8 +5909,8 @@ void stepperInit(stepper_t* stepper){
  8002d36:	f44f 7100 	mov.w	r1, #512	; 0x200
  8002d3a:	4807      	ldr	r0, [pc, #28]	; (8002d58 <stepperInit+0x7c>)
  8002d3c:	f002 fafe 	bl	800533c <HAL_GPIO_WritePin>
-	HAL_GPIO_WritePin(MS2_GPIO_Port, MS2_Pin, GPIO_PIN_RESET);
- 8002d40:	2200      	movs	r2, #0
+	HAL_GPIO_WritePin(MS2_GPIO_Port, MS2_Pin, GPIO_PIN_SET);
+ 8002d40:	2201      	movs	r2, #1
  8002d42:	f44f 6180 	mov.w	r1, #1024	; 0x400
  8002d46:	4804      	ldr	r0, [pc, #16]	; (8002d58 <stepperInit+0x7c>)
  8002d48:	f002 faf8 	bl	800533c <HAL_GPIO_WritePin>
@@ -6751,7 +6752,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* hadc)
  8003380:	d001      	beq.n	8003386 <HAL_ADC_MspInit+0xc6>
     {
       Error_Handler();
- 8003382:	f7ff fb53 	bl	8002a2c <Error_Handler>
+ 8003382:	f7ff fb51 	bl	8002a28 <Error_Handler>
     }
 
     __HAL_LINKDMA(hadc,DMA_Handle,hdma_adc1);
@@ -6929,7 +6930,7 @@ void HAL_I2S_MspInit(I2S_HandleTypeDef* hi2s)
  800348a:	d001      	beq.n	8003490 <HAL_I2S_MspInit+0x50>
     {
       Error_Handler();
- 800348c:	f7ff face 	bl	8002a2c <Error_Handler>
+ 800348c:	f7ff facc 	bl	8002a28 <Error_Handler>
     }
 
     /* Peripheral clock enable */
@@ -7400,7 +7401,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
  800375e:	d001      	beq.n	8003764 <HAL_UART_MspInit+0xd0>
     {
       Error_Handler();
- 8003760:	f7ff f964 	bl	8002a2c <Error_Handler>
+ 8003760:	f7ff f962 	bl	8002a28 <Error_Handler>
     }
 
     __HAL_LINKDMA(huart,hdmarx,hdma_usart2_rx);
@@ -7460,7 +7461,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
  80037bc:	d001      	beq.n	80037c2 <HAL_UART_MspInit+0x12e>
     {
       Error_Handler();
- 80037be:	f7ff f935 	bl	8002a2c <Error_Handler>
+ 80037be:	f7ff f933 	bl	8002a28 <Error_Handler>
     }
 
     __HAL_LINKDMA(huart,hdmatx,hdma_usart2_tx);
@@ -21085,7 +21086,7 @@ void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim)
 #else
       HAL_TIM_PeriodElapsedCallback(htim);
  8008862:	6878      	ldr	r0, [r7, #4]
- 8008864:	f7fa f8d0 	bl	8002a08 <HAL_TIM_PeriodElapsedCallback>
+ 8008864:	f7fa f8ce 	bl	8002a04 <HAL_TIM_PeriodElapsedCallback>
 #endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
     }
   }
