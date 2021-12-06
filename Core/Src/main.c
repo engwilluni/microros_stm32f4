@@ -41,11 +41,35 @@
 #include <std_msgs/msg/u_int32.h>
 #include <sensor_msgs/msg/nav_sat_fix.h>
 #include <std_msgs/msg/u_int16_multi_array.h>
+#include <std_msgs/msg/float32.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef struct {
+	float time;
+	float latitude;
+	float longitude;
+	float hdop;
+	float altitude;
+	float geoid;
+	char ns;
+	char ew;
+	char unit;
+	int lock;
+	int sats;
+} gps_t;
 
+typedef struct {
+	uint32_t digital_input;
+	uint32_t analog_input[2];
+} sensor_data_t;
+
+
+typedef struct {
+	uint32_t stepper_target_position;
+	uint32_t digital_output;
+}ros_cmd_t;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -53,6 +77,7 @@
 #define TF_GPS_DATA 1<<0
 #define TF_STEPPER_INT 1<<0
 #define TF_STEPPER_DATA 1<<1
+#define TF_MAIN_ROS_CMD 1<<0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -98,42 +123,24 @@ osThreadId_t task_stepperHandle;
 const osThreadAttr_t task_stepper_attributes = {
   .name = "task_stepper",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
-/* Definitions for task_angle_sens */
-osThreadId_t task_angle_sensHandle;
-const osThreadAttr_t task_angle_sens_attributes = {
-  .name = "task_angle_sens",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
-/* Definitions for task_analog_inp */
-osThreadId_t task_analog_inpHandle;
-const osThreadAttr_t task_analog_inp_attributes = {
-  .name = "task_analog_inp",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
-/* Definitions for task_dac */
-osThreadId_t task_dacHandle;
-const osThreadAttr_t task_dac_attributes = {
-  .name = "task_dac",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
-};
-/* Definitions for task_digital_io */
-osThreadId_t task_digital_ioHandle;
-const osThreadAttr_t task_digital_io_attributes = {
-  .name = "task_digital_io",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityAboveNormal,
+  .priority = (osPriority_t) osPriorityRealtime,
 };
 /* Definitions for task_main */
 osThreadId_t task_mainHandle;
 const osThreadAttr_t task_main_attributes = {
   .name = "task_main",
   .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityRealtime,
+  .priority = (osPriority_t) osPriorityAboveNormal,
+};
+/* Definitions for stepperMutex */
+osMutexId_t stepperMutexHandle;
+const osMutexAttr_t stepperMutex_attributes = {
+  .name = "stepperMutex"
+};
+/* Definitions for sensorDataMutex */
+osMutexId_t sensorDataMutexHandle;
+const osMutexAttr_t sensorDataMutex_attributes = {
+  .name = "sensorDataMutex"
 };
 /* USER CODE BEGIN PV */
 /* Subscriber declaration */
@@ -147,13 +154,14 @@ rcl_publisher_t ros2_gpio_input_pub;
 rcl_publisher_t ros2_gps_pub;
 rcl_publisher_t ros2_analog_input_pub;
 rcl_publisher_t ros2_stepper_current_position_pub;
-
+rcl_publisher_t ros2_stepper_speed_pub;
 /* ROS timer declaration */
 
 rcl_timer_t ros2_gpio_input_timer;
 rcl_timer_t ros2_gps_timer;
 rcl_timer_t ros2_analog_input_timer;
 rcl_timer_t ros2_stepper_current_position_timer;
+rcl_timer_t ros2_stepper_speed_timer;
 
 /* Messages declaration */
 
@@ -164,27 +172,26 @@ std_msgs__msg__UInt16MultiArray ros2_analog_input_msg;
 std_msgs__msg__UInt32 ros2_gpio_output_msg;
 std_msgs__msg__UInt32 ros2_stepper_target_position_msg;
 std_msgs__msg__UInt32 ros2_stepper_current_position_msg;
+std_msgs__msg__Float32 ros2_stepper_speed_msg;
 
 uint16_t adc_values[2];
 uint32_t gpio_input;
 uint8_t gps_buffer[256];
 uint8_t gps_buffer_index = 0;
-uint8_t* p_gps_buff;
 uint8_t uart_gps_rx = 0;
 
-stepper_t stepper1;
 
+
+stepper_t stepper;
+gps_t gps;
+ros_cmd_t ros_cmd;
+sensor_data_t sensor_data;
 
 
 HAL_StatusTypeDef status;
 
-//gps data
-float gps_time=0 , gps_latitude=0, gps_longitude=0, gps_hdop=0, gps_alt=0, gps_geoid=0;
-char gps_latitude_string[32];
-char gps_longitude_string[32];
-char gps_alt_string[32];
-char ns='?', ew='?', unit='?';
-int lock = 0, sats=0;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -202,10 +209,6 @@ static void MX_TIM3_Init(void);
 void task_ros2_function(void *argument);
 void task_gps_function(void *argument);
 void task_stepper_function(void *argument);
-void task_angle_sensor_function(void *argument);
-void task_analog_input_function(void *argument);
-void task_dac_function(void *argument);
-void task_digital_io_function(void *argument);
 void task_main_function(void *argument);
 
 /* USER CODE BEGIN PFP */
@@ -224,6 +227,7 @@ void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 void ros2_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 void ros2_stepper_current_position_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+void ros2_stepper_speed_timer_callback(rcl_timer_t * timer, int64_t last_call_time);
 
 void ros2_gpio_output_callback(const void * msgin);
 void ros2_stepper_target_position_callback(const void * msgin);
@@ -231,6 +235,7 @@ void ros2_stepper_target_position_callback(const void * msgin);
 //extern int clock_gettime( int clock_id, struct timespec * tp );
 extern void UTILS_NanosecondsToTimespec( int64_t llSource, struct timespec * const pxDestination );
 double convertDegMinToDecDeg (float degMin);
+void updateDigitalOuputs(uint32_t digital_output);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -282,6 +287,12 @@ int main(void)
 
   /* Init scheduler */
   osKernelInitialize();
+  /* Create the mutex(es) */
+  /* creation of stepperMutex */
+  stepperMutexHandle = osMutexNew(&stepperMutex_attributes);
+
+  /* creation of sensorDataMutex */
+  sensorDataMutexHandle = osMutexNew(&sensorDataMutex_attributes);
 
   /* USER CODE BEGIN RTOS_MUTEX */
   /* add mutexes, ... */
@@ -308,18 +319,6 @@ int main(void)
 
   /* creation of task_stepper */
   task_stepperHandle = osThreadNew(task_stepper_function, NULL, &task_stepper_attributes);
-
-  /* creation of task_angle_sens */
-  task_angle_sensHandle = osThreadNew(task_angle_sensor_function, NULL, &task_angle_sens_attributes);
-
-  /* creation of task_analog_inp */
-  task_analog_inpHandle = osThreadNew(task_analog_input_function, NULL, &task_analog_inp_attributes);
-
-  /* creation of task_dac */
-  task_dacHandle = osThreadNew(task_dac_function, NULL, &task_dac_attributes);
-
-  /* creation of task_digital_io */
-  task_digital_ioHandle = osThreadNew(task_digital_io_function, NULL, &task_digital_io_attributes);
 
   /* creation of task_main */
   task_mainHandle = osThreadNew(task_main_function, NULL, &task_main_attributes);
@@ -857,21 +856,7 @@ double convertDegMinToDecDeg (float degMin)
 void ros2_gpio_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 {
 
-		// Blink the LED1 (yellow) for debugging
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port , LD2_Pin);
-
-		// Fill the message timestamp
-
-		//clock_gettime(CLOCK_REALTIME, &ts);
-
-		// Create the Header
-
-
-
-		//sprintf(joint_state_msg.header.frame_id.data, "%ld", seq_no);
-		//joint_state_msg.header.frame_id.size = strlen(joint_state_msg.header.frame_id.data);
-
-		ros2_gpio_input_msg.data= gpio_input;
+		ros2_gpio_input_msg.data= sensor_data.digital_input;
 
 		// Publish the message
 		rcl_ret_t ret = rcl_publish(&ros2_gpio_input_pub, &ros2_gpio_input_msg, NULL);
@@ -894,9 +879,9 @@ void ros2_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
 		ros2_gps_msg.header.stamp.sec = ts.tv_sec;
 		ros2_gps_msg.header.stamp.nanosec = ts.tv_nsec;
 
-		ros2_gps_msg.latitude = gps_latitude;
-		ros2_gps_msg.longitude = gps_longitude;
-		ros2_gps_msg.altitude = gps_alt;
+		ros2_gps_msg.latitude = gps.latitude;
+		ros2_gps_msg.longitude = gps.longitude;
+		ros2_gps_msg.altitude = gps.altitude;
 		// Publish the message
 				rcl_ret_t ret = rcl_publish(&ros2_gps_pub, &ros2_gps_msg, NULL);
 				if (ret != RCL_RET_OK)
@@ -910,8 +895,10 @@ void ros2_gps_timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
 
 void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
 	if (timer != NULL) {
-	ros2_analog_input_msg.data.data[0] = adc_values[0];
-	ros2_analog_input_msg.data.data[1] = adc_values[1];
+		osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+	ros2_analog_input_msg.data.data[0] = sensor_data.analog_input[0];
+	ros2_analog_input_msg.data.data[1] = sensor_data.analog_input[1];
+	osMutexRelease(sensorDataMutexHandle);
 	// Publish the message
 					rcl_ret_t ret = rcl_publish(&ros2_analog_input_pub, &ros2_analog_input_msg, NULL);
 					if (ret != RCL_RET_OK)
@@ -922,9 +909,25 @@ void ros2_analog_input_timer_callback(rcl_timer_t * timer, int64_t last_call_tim
 
 }
 
+void ros2_stepper_speed_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
+	if (timer != NULL) {
+
+	ros2_stepper_speed_msg.data = stepper.speed;
+
+	// Publish the message
+					rcl_ret_t ret = rcl_publish(&ros2_stepper_speed_pub, &ros2_stepper_speed_msg, NULL);
+					if (ret != RCL_RET_OK)
+					{
+					  printf("Error publishing stepper speed (line %d)\n", __LINE__);
+					}
+	}
+}
+
 void ros2_stepper_current_position_timer_callback(rcl_timer_t * timer, int64_t last_call_time){
 	if (timer != NULL) {
-	ros2_stepper_current_position_msg.data = stepper1.currentPos;
+
+	ros2_stepper_current_position_msg.data = stepper.currentPos;
+
 	// Publish the message
 					rcl_ret_t ret = rcl_publish(&ros2_stepper_current_position_pub, &ros2_stepper_current_position_msg, NULL);
 					if (ret != RCL_RET_OK)
@@ -935,6 +938,8 @@ void ros2_stepper_current_position_timer_callback(rcl_timer_t * timer, int64_t l
 }
 
 
+
+
 void ros2_stepper_target_position_callback(const void * msgin){
 	const std_msgs__msg__UInt32 *stepper_target_position_msg;
 
@@ -942,10 +947,11 @@ void ros2_stepper_target_position_callback(const void * msgin){
 		{
 
 
-
 			stepper_target_position_msg = (const std_msgs__msg__UInt32 *)msgin;
-			stepper1.targetPos = stepper_target_position_msg->data;
-			osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
+
+			ros_cmd.stepper_target_position = stepper_target_position_msg->data;
+
+			osThreadFlagsSet(task_mainHandle, TF_MAIN_ROS_CMD);
 
 		}
 }
@@ -962,7 +968,11 @@ void ros2_gpio_output_callback(const void * msgin)
 
 		gpio_output_msg = (const std_msgs__msg__UInt32 *)msgin;
 		data = gpio_output_msg->data;
-		HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, (data & 0x00000001));
+
+		ros_cmd.digital_output = data;
+		osThreadFlagsSet(task_mainHandle, TF_MAIN_ROS_CMD);
+
+
 
 
 	}
@@ -985,16 +995,21 @@ if (huart->Instance == USART3){
 
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim){
 	if (htim->Instance == TIM3){
-		if (stepper1.direction == DIRECTION_CW) {
-			stepper1.currentPos++;
+		if (stepper.direction == DIRECTION_CW) {
+			stepper.currentPos++;
 			HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, GPIO_PIN_SET);
 		} else {
-			stepper1.currentPos--;
+			stepper.currentPos--;
 			HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, GPIO_PIN_RESET);
 		}
 		osThreadFlagsSet(task_stepperHandle, TF_STEPPER_INT);
 
 	}
+}
+
+void updateDigitalOuputs(uint32_t digital_output){
+	HAL_GPIO_WritePin(LD6_GPIO_Port, LD6_Pin, (digital_output & 0x0001)>> 0);
+	HAL_GPIO_WritePin(LD5_GPIO_Port, LD5_Pin, (digital_output & 0x0002)>> 1);
 }
 /* USER CODE END 4 */
 
@@ -1027,48 +1042,6 @@ void task_ros2_function(void *argument)
 		  printf("Error on default allocators (line %d)\n", __LINE__);
 	  }
 
-	  // micro-ROS app
-	  /*rclc_support_t support;
-	  rcl_allocator_t allocator;
-	  rcl_node_t node;
-	  rclc_executor_t executor;
-
-	  allocator = rcl_get_default_allocator();
-
-	  //create init_options
-	  rclc_support_init(&support, 0, NULL, &allocator);
-
-	  // create node
-	  rclc_node_init_default(&node, "acquisition_system", "", &support);
-	  // It is not possible to see the nodes and topics in the ros2 terminal neither in the rqt
-	  // This problem due ROS_DOMAIN_ID. To "solve" it run unset ROS_DOMAIN_ID.
-	  // Details are described here https://github.com/micro-ROS/micro_ros_arduino/issues/21*/
-
-
-
-	  /*rclc_support_t support;
-	  rcl_allocator_t allocator;
-	  rcl_node_t node;
-	  rclc_executor_t executor;
-	  rcl_init_options_t init_options;
-	  size_t domain_id;
-
-	  allocator = rcl_get_default_allocator();
-	  init_options = rcl_get_zero_initialized_init_options();
-	  rcl_init_options_init(&init_options, allocator);
-
-	  domain_id = 25;
-	  if(rcl_init_options_set_domain_id(&init_options, domain_id) != RCL_RET_OK)
-	  {
-		  printf("Error on rcl_init_options_set_domain_id (line %d)\n", __LINE__);
-	  }
-
-	  // create init_options
-	  rclc_support_init_with_options(&support, 0, NULL, &init_options, &allocator);
-
-	  // create node
-	  rclc_node_init_default(&node, "acquisition_system", "", &support);*/
-
 
 
 	  rclc_support_t support;
@@ -1093,11 +1066,6 @@ void task_ros2_function(void *argument)
 	  //time sync
 	  if( rmw_uros_sync_session(1000) != RMW_RET_OK)
 		  printf("Error on time sync (line %d)\n", __LINE__);
-
-	  //int64_t time_ns;
-	  //time_ns = rmw_uros_epoch_nanos();
-
-
 
 
 	  //create gpio_output_sub
@@ -1145,6 +1113,11 @@ void task_ros2_function(void *argument)
 	  	  			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, UInt32),
 	  	  			  "/stepper_current_position");
 
+	  rclc_publisher_init_default(
+		  	  			  &ros2_stepper_speed_pub,
+		  	  			  &node,
+		  	  			  ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
+		  	  			  "/stepper_speed");
 
 	  // gps memmory allocation
 	  ros2_gps_msg.header.frame_id.capacity = 20;
@@ -1170,13 +1143,15 @@ void task_ros2_function(void *argument)
 
 
 	  // Create a timer
-	  rclc_timer_init_default(&ros2_gpio_input_timer, &support, RCL_MS_TO_NS(1000), ros2_gpio_input_timer_callback);
+	  rclc_timer_init_default(&ros2_gpio_input_timer, &support, RCL_MS_TO_NS(100), ros2_gpio_input_timer_callback);
 	  rclc_timer_init_default(&ros2_gps_timer, &support, RCL_MS_TO_NS(1000), ros2_gps_timer_callback);
-	  rclc_timer_init_default(&ros2_analog_input_timer, &support, RCL_MS_TO_NS(50), ros2_analog_input_timer_callback);
-	  rclc_timer_init_default(&ros2_stepper_current_position_timer, &support, RCL_MS_TO_NS(50), ros2_stepper_current_position_timer_callback);
+	  rclc_timer_init_default(&ros2_analog_input_timer, &support, RCL_MS_TO_NS(100), ros2_analog_input_timer_callback);
+	  rclc_timer_init_default(&ros2_stepper_current_position_timer, &support, RCL_MS_TO_NS(100), ros2_stepper_current_position_timer_callback);
+	  rclc_timer_init_default(&ros2_stepper_speed_timer, &support, RCL_MS_TO_NS(100), ros2_stepper_speed_timer_callback);
+
 
 	  // Create executor
-	  rclc_executor_init(&executor, &support.context, 6, &allocator);
+	  rclc_executor_init(&executor, &support.context, 7, &allocator);
 
 	  rclc_executor_add_subscription(&executor, &ros2_gpio_output_sub, &ros2_gpio_output_msg,
 	  			  &ros2_gpio_output_callback, ON_NEW_DATA); // ON_NEW_DATA does not work properly
@@ -1186,6 +1161,7 @@ void task_ros2_function(void *argument)
 	  rclc_executor_add_timer(&executor, &ros2_gpio_input_timer);
 	  rclc_executor_add_timer(&executor, &ros2_gps_timer);
 	  rclc_executor_add_timer(&executor, &ros2_analog_input_timer);
+	  rclc_executor_add_timer(&executor, &ros2_stepper_speed_timer);
 	  rclc_executor_add_timer(&executor, &ros2_stepper_current_position_timer);
 
 
@@ -1211,21 +1187,19 @@ void task_ros2_function(void *argument)
 void task_gps_function(void *argument)
 {
   /* USER CODE BEGIN task_gps_function */
-	//uint8_t gpgga[] = "$GPGGA,092725.00,4717.11399,N,00833.91590,E,1,8,1.01,499.6,M,48.0,M,,0*5B\r\n";
-
 
   /* Infinite loop */
   for(;;)
   {
     osThreadFlagsWait(TF_GPS_DATA, osFlagsWaitAny, osWaitForever);
-    if(sscanf(gps_buffer, "$GPGGA,%f,%f,%c,%f,%c,%d,%d,%f,%f,%c,%f", &gps_time, &gps_latitude, &ns, &gps_longitude, &ew, &lock, &sats, &gps_hdop, &gps_alt, &unit, &gps_geoid) >= 1){
-    	gps_latitude = (float) convertDegMinToDecDeg(gps_latitude);
-    	gps_longitude = (float) convertDegMinToDecDeg(gps_longitude);
-    	if (ns == 'S') {
-    		gps_latitude = - gps_latitude;
+    if(sscanf(gps_buffer, "$GPGGA,%f,%f,%c,%f,%c,%d,%d,%f,%f,%c,%f", &gps.time, &gps.latitude, &gps.ns, &gps.longitude, &gps.ew, &gps.lock, &gps.sats, &gps.hdop, &gps.altitude, &gps.unit, &gps.geoid) >= 1){
+    	gps.latitude = (float) convertDegMinToDecDeg(gps.latitude);
+    	gps.longitude = (float) convertDegMinToDecDeg(gps.longitude);
+    	if (gps.ns == 'S') {
+    		gps.latitude = - gps.latitude;
     	}
-    	if (ew = 'W'){
-    		gps_longitude = - gps_longitude;
+    	if (gps.ew = 'W'){
+    		gps.longitude = - gps.longitude;
     	}
     }
     gps_buffer_index = 0;
@@ -1245,14 +1219,14 @@ void task_stepper_function(void *argument)
 {
   /* USER CODE BEGIN task_stepper_function */
 	uint32_t flags;
-	stepperInit(&stepper1);
+	stepperInit(&stepper);
 
-	stepperSetSpeed(&stepper1, 1);
-	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
-	stepperSetAcceleration(&stepper1, 250);
-	stepperSetMaxSpeed(&stepper1, 500);
-	stepperSetAbsoluteTartePosition(&stepper1, 0);
-	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
+	stepperSetSpeed(&stepper, 1);
+	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
+	stepperSetAcceleration(&stepper, 1000);
+	stepperSetMaxSpeed(&stepper, 240);
+	stepperSetAbsoluteTartePosition(&stepper, 0);
+	__HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
 	 HAL_TIM_PWM_Start_IT(&htim3, TIM_CHANNEL_1);
   /* Infinite loop */
   for(;;)
@@ -1260,101 +1234,16 @@ void task_stepper_function(void *argument)
 
 	  flags = osThreadFlagsWait((TF_STEPPER_INT | TF_STEPPER_DATA), osFlagsWaitAny, osWaitForever);
 	  if ((flags & TF_STEPPER_INT) == TF_STEPPER_INT){
-		  stepperComputeNewSpeed(&stepper1);
-		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
+		  stepperComputeNewSpeed(&stepper);
+		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
 	  }
 
 	  if ((flags & TF_STEPPER_DATA) == TF_STEPPER_DATA){
-		  stepperComputeNewSpeed(&stepper1);
-		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper1.stepInverval);
+		  stepperComputeNewSpeed(&stepper);
+		  __HAL_TIM_SET_AUTORELOAD(&htim3, stepper.stepInverval);
 	  }
-
-
-
-    osDelay(1);
   }
   /* USER CODE END task_stepper_function */
-}
-
-/* USER CODE BEGIN Header_task_angle_sensor_function */
-/**
-* @brief Function implementing the task_angle_sens thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_task_angle_sensor_function */
-void task_angle_sensor_function(void *argument)
-{
-  /* USER CODE BEGIN task_angle_sensor_function */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END task_angle_sensor_function */
-}
-
-/* USER CODE BEGIN Header_task_analog_input_function */
-/**
-* @brief Function implementing the task_analog_inp thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_task_analog_input_function */
-void task_analog_input_function(void *argument)
-{
-  /* USER CODE BEGIN task_analog_input_function */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END task_analog_input_function */
-}
-
-/* USER CODE BEGIN Header_task_dac_function */
-/**
-* @brief Function implementing the task_dac thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_task_dac_function */
-void task_dac_function(void *argument)
-{
-  /* USER CODE BEGIN task_dac_function */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END task_dac_function */
-}
-
-/* USER CODE BEGIN Header_task_digital_io_function */
-/**
-* @brief Function implementing the task_digital_io thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_task_digital_io_function */
-void task_digital_io_function(void *argument)
-{
-  /* USER CODE BEGIN task_digital_io_function */
-	uint16_t button_input = 0;
-  /* Infinite loop */
-  for(;;)
-  {
-	  button_input = HAL_GPIO_ReadPin(PB0_GPIO_Port, PB0_Pin);
-
-	  if (button_input == GPIO_PIN_RESET){
-		  gpio_input &= !(1<<0);
-	  }
-	  else {
-		  gpio_input |= (1<<0);
-	  }
-    osDelay(50);
-  }
-  /* USER CODE END task_digital_io_function */
 }
 
 /* USER CODE BEGIN Header_task_main_function */
@@ -1367,10 +1256,25 @@ void task_digital_io_function(void *argument)
 void task_main_function(void *argument)
 {
   /* USER CODE BEGIN task_main_function */
+	uint32_t flags  = 0;
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+
+	  flags = osThreadFlagsWait(TF_MAIN_ROS_CMD, osFlagsWaitAny, 0);
+	  if ((flags & TF_MAIN_ROS_CMD) == TF_MAIN_ROS_CMD){
+		  stepper.targetPos = ros_cmd.stepper_target_position;
+		  osThreadFlagsSet(task_stepperHandle, TF_STEPPER_DATA);
+		  updateDigitalOuputs(ros_cmd.digital_output);
+
+	  }
+	  osMutexAcquire(sensorDataMutexHandle, osWaitForever);
+	  sensor_data.digital_input = HAL_GPIO_ReadPin(PB0_GPIO_Port, PB0_Pin);
+	  sensor_data.analog_input[0] = adc_values[0];
+	  sensor_data.analog_input[1] = adc_values[1];
+	  osMutexRelease(sensorDataMutexHandle);
+
+    osDelay(50);
   }
   /* USER CODE END task_main_function */
 }
